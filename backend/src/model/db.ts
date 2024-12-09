@@ -29,7 +29,7 @@ interface IChatRoom extends Document {
 
 const userSchema = new Schema<IUser>({
     username: {type: String, unique: true},
-    password: {type: String, unique: true}
+    password: {type: String}
 })
 
 const chatSchema = new Schema<IChat>({
@@ -66,5 +66,5 @@ const chatRoomSchema = new Schema<IChatRoom>({
 })
 
 export const userModel = mongoose.model("users", userSchema)
-export const chatModel = mongoose.model("users", userSchema)
-export const chatRoomModel = mongoose.model("users", chatRoomSchema)
+export const chatModel = mongoose.model("chats", chatSchema)
+export const chatRoomModel = mongoose.model("chatrooms", chatRoomSchema)
