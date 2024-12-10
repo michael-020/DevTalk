@@ -67,9 +67,9 @@ const wssServer = http.createServer();
 
 setupWebSocketServer(wssServer, JWT_PASS);
 
-wssServer.listen(8080, () => {
-    console.log(`WebSocket server running on port 8080`);
-});
+// wssServer.listen(8080, () => {
+//     console.log(`WebSocket server running on port 8080`);
+// });
 
 function wsAuthMiddleware(httpServer: http.Server, wss: WebSocketServer, JWT_PASS: string) {
     httpServer.on('upgrade', async (request, socket, head) => {
@@ -321,3 +321,4 @@ export function setupWebSocketServer(httpServer: http.Server, JWT_PASS: string) 
 }
 
 export const wss = setupWebSocketServer;
+export default wssServer
