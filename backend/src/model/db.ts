@@ -5,11 +5,14 @@ const Schema = mongoose.Schema;
 interface IUser extends Document {
     username: string;
     password: string;
+    socketId?: string; 
+    room?: string;
 }
 
 interface IChat extends Document {
     chatRoom: mongoose.Types.ObjectId; 
     sender: mongoose.Types.ObjectId; 
+    receiver: mongoose.Types.ObjectId;
     content: string; 
     // messageType: 'text' | 'image' | 'video' | 'file'; // Type of message
     // readBy: mongoose.Types.ObjectId[]; 
@@ -17,31 +20,37 @@ interface IChat extends Document {
     updatedAt: Date;
 }
 
-interface IChatRoom extends Document {
+export interface IChatRoom extends Document {
     // type: 'private' | 'group'; 
     participants: mongoose.Types.ObjectId[]; 
     // groupName?: string; 
     // groupImagePath?: string;
-    messages: mongoose.Types.ObjectId; 
+    messages?: mongoose.Types.ObjectId; 
     createdAt: Date;
     updatedAt: Date;
 }
 
 const userSchema = new Schema<IUser>({
     username: {type: String, unique: true},
-    password: {type: String}
+    password: {type: String},
+    socketId: { type: String, default: "" },
+    room: { type: String, default: "" }
 })
 
 const chatSchema = new Schema<IChat>({
     chatRoom: { 
         type: Schema.Types.ObjectId, 
-        ref: 'ChatRoom', 
+        ref: 'chatrooms', 
         required: true 
     },
     sender: { 
         type: Schema.Types.ObjectId, 
-        ref: 'User', 
+        ref: 'users', 
         required: true 
+    },
+    receiver: {
+        type: Schema.Types.ObjectId,
+        ref: "users"
     },
     content: { 
         type: String, 
@@ -53,14 +62,14 @@ const chatSchema = new Schema<IChat>({
 
 const chatRoomSchema = new Schema<IChatRoom>({
     participants: [{ 
-        type: Schema.Types.ObjectId, 
-        ref: 'User', 
+        type: mongoose.Schema.Types.ObjectId, 
+        ref: 'users', 
         required: true 
     }],
-    messages: { 
+    messages: [{ 
         type: Schema.Types.ObjectId, 
-        ref: 'Message' 
-    }
+        ref: 'chats' 
+    }]
 }, {
     timestamps: true
 })
