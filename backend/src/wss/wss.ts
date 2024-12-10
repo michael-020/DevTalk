@@ -6,6 +6,7 @@ import mongoose from 'mongoose';
 import { app } from '..';
 import { JWT_PASS } from '../config';
 
+// Enhanced type definitions
 enum WebSocketMessageType {
     ENTER_ROOM = 'ENTER_ROOM',
     SEND_MESSAGE = 'SEND_MESSAGE',
@@ -18,6 +19,47 @@ interface WebSocketMessagePayload {
         otherUserId?: string;
         content?: string;
         chatRoomId?: string;
+    };
+}
+
+interface ExtendedWebSocket extends WebSocket {
+    user?: WebSocketUser;
+}
+
+interface WebSocketUser {
+    _id: mongoose.Types.ObjectId;
+    username: string;
+    chatRoomId?: string;
+}
+
+interface ChatMessage {
+    chatRoom: mongoose.Types.ObjectId;
+    sender: mongoose.Types.ObjectId;
+    content: string;
+    createdAt: Date;
+}
+
+interface ChatRoom {
+    _id: mongoose.Types.ObjectId;
+    participants: mongoose.Types.ObjectId[];
+    messages: mongoose.Types.ObjectId[];
+}
+
+interface ErrorMessage {
+    type: 'ERROR';
+    data: { message: string };
+}
+
+interface FormattedMessage {
+    type: WebSocketMessageType.SEND_MESSAGE;
+    data: {
+        chatRoomId: string;
+        content: string;
+        sender: {
+            _id: mongoose.Types.ObjectId;
+            username?: string;
+        };
+        createdAt: Date;
     };
 }
 
@@ -51,8 +93,8 @@ function wsAuthMiddleware(httpServer: http.Server, wss: WebSocketServer, JWT_PAS
                 return;
             }
 
-            wss.handleUpgrade(request, socket, head, (ws) => {
-                (ws as any).user = { _id: user._id, username: user.username };
+            wss.handleUpgrade(request, socket, head, (ws: ExtendedWebSocket) => {
+                ws.user = { _id: user._id, username: user.username };
                 wss.emit('connection', ws, request);
             });
 
@@ -65,11 +107,11 @@ function wsAuthMiddleware(httpServer: http.Server, wss: WebSocketServer, JWT_PAS
 }
 
 class ChatWebSocket {
-    private ws: WebSocket & { user?: { _id: mongoose.Types.ObjectId, username: string, chatRoomId?: string } };
+    private ws: ExtendedWebSocket;
     private userId: mongoose.Types.ObjectId;
-    private static clients: Map<string, Set<WebSocket>> = new Map();
+    private static clients: Map<string, Set<ExtendedWebSocket>> = new Map();
 
-    constructor(userId: mongoose.Types.ObjectId, ws: WebSocket & { user?: { _id: mongoose.Types.ObjectId, username: string, chatRoomId?: string } }) {
+    constructor(userId: mongoose.Types.ObjectId, ws: ExtendedWebSocket) {
         this.userId = userId;
         this.ws = ws;
         this.initializeWebSocketHandlers();
@@ -92,7 +134,7 @@ class ChatWebSocket {
         });
     }
 
-    private async enterChatRoom(otherUserId: mongoose.Types.ObjectId) {
+    private async enterChatRoom(otherUserId: mongoose.Types.ObjectId): Promise<mongoose.Types.ObjectId | null> {
         try {
             let chatRoom = await chatRoomModel.findOne({
                 participants: { 
@@ -144,11 +186,15 @@ class ChatWebSocket {
                 })
             );
 
-            if(!this.ws.user){
-                this.ws.user = { _id: new mongoose.Types.ObjectId(), username: 'default', chatRoomId: '' };
+            // Ensure ws.user exists
+            if (!this.ws.user) {
+                this.ws.user = { 
+                    _id: new mongoose.Types.ObjectId(), 
+                    username: 'default', 
+                    chatRoomId: '' 
+                };
             }
 
-            this.ws.user = this.ws.user || {};
             this.ws.user.chatRoomId = chatRoom._id.toString();
     
             if (!ChatWebSocket.clients.has(chatRoom._id.toString())) {
@@ -164,7 +210,7 @@ class ChatWebSocket {
         }
     }
 
-    private broadcastToChatRoom(chatRoomId: string, message: object) {
+    private broadcastToChatRoom(chatRoomId: string, message: FormattedMessage | ErrorMessage) {
         const roomClients = ChatWebSocket.clients.get(chatRoomId);
         if (roomClients) {
             roomClients.forEach((client) => {
@@ -191,7 +237,7 @@ class ChatWebSocket {
                 { $push: { messages: chatMessage._id } }
             );
 
-            const formattedMessage = {
+            const formattedMessage: FormattedMessage = {
                 type: WebSocketMessageType.SEND_MESSAGE,
                 data: {
                     chatRoomId: chatRoomId.toString(),
@@ -249,12 +295,11 @@ class ChatWebSocket {
     }
 
     private sendErrorMessage(errorMessage: string) {
-        this.ws.send(
-            JSON.stringify({
-                type: 'ERROR',
-                data: { message: errorMessage }
-            })
-        );
+        const errorPayload: ErrorMessage = {
+            type: 'ERROR',
+            data: { message: errorMessage }
+        };
+        this.ws.send(JSON.stringify(errorPayload));
     }
 }
 
@@ -263,7 +308,7 @@ export function setupWebSocketServer(httpServer: http.Server, JWT_PASS: string) 
 
     wsAuthMiddleware(httpServer, wss, JWT_PASS);
 
-    wss.on('connection', (ws: WebSocket & { user?: any }) => {
+    wss.on('connection', (ws: ExtendedWebSocket) => {
         if (!ws.user) {
             ws.close(4001, 'Unauthorized');
             return;

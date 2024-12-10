@@ -1,12 +1,10 @@
-import mongoose, { Date, ObjectId } from "mongoose";
+import mongoose, { ObjectId } from "mongoose";
 
 const Schema = mongoose.Schema;
 
 interface IUser extends Document {
     username: string;
     password: string;
-    socketId?: string; 
-    room?: string;
 }
 
 interface IChat extends Document {
@@ -14,27 +12,20 @@ interface IChat extends Document {
     sender: mongoose.Types.ObjectId; 
     receiver: mongoose.Types.ObjectId;
     content: string; 
-    // messageType: 'text' | 'image' | 'video' | 'file'; // Type of message
-    // readBy: mongoose.Types.ObjectId[]; 
     createdAt: Date;
     updatedAt: Date;
 }
 
 export interface IChatRoom extends Document {
-    // type: 'private' | 'group'; 
     participants: mongoose.Types.ObjectId[]; 
-    // groupName?: string; 
-    // groupImagePath?: string;
-    messages?: mongoose.Types.ObjectId; 
+    messages?: mongoose.Types.ObjectId[]; 
     createdAt: Date;
     updatedAt: Date;
 }
 
 const userSchema = new Schema<IUser>({
     username: {type: String, unique: true},
-    password: {type: String},
-    socketId: { type: String, default: "" },
-    room: { type: String, default: "" }
+    password: {type: String}
 })
 
 const chatSchema = new Schema<IChat>({
