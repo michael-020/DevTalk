@@ -93,9 +93,9 @@ function wsAuthMiddleware(httpServer: http.Server, wss: WebSocketServer, JWT_PAS
                 return;
             }
 
-            wss.handleUpgrade(request, socket, head, (ws: ExtendedWebSocket) => {
-                ws.user = { _id: user._id, username: user.username };
-                wss.emit('connection', ws, request);
+            wss.handleUpgrade(request, socket, head, (socket: ExtendedWebSocket) => {
+                socket.user = { _id: user._id, username: user.username };
+                wss.emit('connection', socket, request);
             });
 
         } catch (error) {
@@ -107,28 +107,28 @@ function wsAuthMiddleware(httpServer: http.Server, wss: WebSocketServer, JWT_PAS
 }
 
 class ChatWebSocket {
-    private ws: ExtendedWebSocket;
+    private socket: ExtendedWebSocket;
     private userId: mongoose.Types.ObjectId;
     private static clients: Map<string, Set<ExtendedWebSocket>> = new Map();
 
-    constructor(userId: mongoose.Types.ObjectId, ws: ExtendedWebSocket) {
+    constructor(userId: mongoose.Types.ObjectId, socket: ExtendedWebSocket) {
         this.userId = userId;
-        this.ws = ws;
+        this.socket = socket;
         this.initializeWebSocketHandlers();
     }
 
     private initializeWebSocketHandlers() {
-        this.ws.on('message', this.handleIncomingMessage.bind(this));
-        this.ws.on('error', (error) => {
+        this.socket.on('message', this.handleIncomingMessage.bind(this));
+        this.socket.on('error', (error) => {
             console.error('WebSocket error:', error);
         });
-        this.ws.on('close', () => {
+        this.socket.on('close', () => {
             console.log('WebSocket connection closed');
 
-            if (this.ws.user?.chatRoomId) {
-                const roomClients = ChatWebSocket.clients.get(this.ws.user.chatRoomId);
+            if (this.socket.user?.chatRoomId) {
+                const roomClients = ChatWebSocket.clients.get(this.socket.user.chatRoomId);
                 if (roomClients) {
-                    roomClients.delete(this.ws);
+                    roomClients.delete(this.socket);
                 }
             }
         });
@@ -176,7 +176,7 @@ class ChatWebSocket {
                 .populate('sender', 'username')
                 .sort({ createdAt: 1 });
     
-            this.ws.send(
+            this.socket.send(
                 JSON.stringify({
                     type: WebSocketMessageType.ENTER_ROOM,
                     data: {
@@ -186,21 +186,22 @@ class ChatWebSocket {
                 })
             );
 
-            // Ensure ws.user exists
-            if (!this.ws.user) {
-                this.ws.user = { 
+            if (!this.socket.user) {
+                this.socket.user = { 
                     _id: new mongoose.Types.ObjectId(), 
                     username: 'default', 
                     chatRoomId: '' 
                 };
             }
 
-            this.ws.user.chatRoomId = chatRoom._id.toString();
+            this.socket.user.chatRoomId = chatRoom._id.toString();
     
             if (!ChatWebSocket.clients.has(chatRoom._id.toString())) {
+                // yaha pe chatRoom ka key add kiya jaa raha hai
                 ChatWebSocket.clients.set(chatRoom._id.toString(), new Set());
             }
-            ChatWebSocket.clients.get(chatRoom._id.toString())?.add(this.ws);
+            // yaha uss chat room me jitne websocket connections onko map kiya jaa raha hai
+            ChatWebSocket.clients.get(chatRoom._id.toString())?.add(this.socket);
     
             return chatRoom._id;
         } catch (error) {
@@ -244,7 +245,7 @@ class ChatWebSocket {
                     content: messageContent,
                     sender: {
                         _id: this.userId,
-                        username: this.ws.user?.username
+                        username: this.socket.user?.username
                     },
                     createdAt: chatMessage.createdAt
                 }
@@ -299,22 +300,22 @@ class ChatWebSocket {
             type: 'ERROR',
             data: { message: errorMessage }
         };
-        this.ws.send(JSON.stringify(errorPayload));
+        this.socket.send(JSON.stringify(errorPayload));
     }
 }
 
 export function setupWebSocketServer(httpServer: http.Server, JWT_PASS: string) {
     const wss = new WebSocketServer({ noServer: true });
 
-    wsAuthMiddleware(httpServer, wss, JWT_PASS);
+    wsAuthMiddleware(httpServer, wss, JWT_PASS); // jwt-pass and httpServer recieved from index.ts
 
-    wss.on('connection', (ws: ExtendedWebSocket) => {
-        if (!ws.user) {
-            ws.close(4001, 'Unauthorized');
+    wss.on('connection', (socket: ExtendedWebSocket) => {
+        if (!socket.user) {
+            socket.close(4001, 'Unauthorized');
             return;
         }
 
-        new ChatWebSocket(ws.user._id, ws);
+        new ChatWebSocket(socket.user._id, socket);
     });
 
     return wss;

@@ -25,7 +25,7 @@ const httpServer = app.listen(3000, () => {
 });
 
 
-const webSocketServer = setupWebSocketServer(httpServer, JWT_PASS);
+setupWebSocketServer(httpServer, JWT_PASS);
 
 const socketServer = wssServer;
 socketServer.listen(8080, () => {
