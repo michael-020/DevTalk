@@ -3,7 +3,7 @@ import cors from "cors"
 import userRouter from "./routes/user";
 import mongoose from "mongoose";
 import './override';
-import wssServer, { setupWebSocketServer } from "./wss/wss";
+import { setUpWebSocketServer } from "./wss/wss";
 import { JWT_PASS } from "./config";
 
 
@@ -25,12 +25,12 @@ const httpServer = app.listen(3000, () => {
 });
 
 
-setupWebSocketServer(httpServer, JWT_PASS);
+setUpWebSocketServer(httpServer, JWT_PASS);
 
-const socketServer = wssServer;
-socketServer.listen(8080, () => {
-    console.log("Websocket server running on port 8080")
-})
+// const socketServer = wssServer;
+// socketServer.listen(8080, () => {
+//     console.log("Websocket server running on port 8080")
+// })
 
 // httpServer.on('upgrade', (request, socket, head) => {
 //     wss.handleUpgrade(request, socket, head, (ws) => {
