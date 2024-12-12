@@ -1,7 +1,9 @@
+import { useState } from "react";
 import { ChatComp } from "../components/ChatComp";
 import { UserCard } from "../components/UserCard";
 
 export function Home(){
+    const [usernames, setUsernames] = useState([])
 
     return <div>
         <div className="flex justify-between w-[60rem] mx-auto mt-24 h-[30rem]">

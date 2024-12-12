@@ -20,19 +20,19 @@ userRouter.post("/signup", async (req: Request, res: Response) => {
 })
 
 userRouter.post("/signin", async (req: Request, res: Response) => {
-    const { username, password  } = req.body
+    const { username, password } = req.body
 
-    const user = await userModel.findOne({username})
+    const user = await userModel.findOne({username: username})
 
     if(!user){
-        res.json({
+        res.status(401).json({
             msg: "user not found"
         })
         return
     }
 
     if(user?.password !== password){
-        res.json({
+        res.status(401).json({
             msg: "Incorrect password"
         })
         return
@@ -47,19 +47,18 @@ userRouter.post("/signin", async (req: Request, res: Response) => {
     })
 })
 
-userRouter.get("/chats", userMiddleware, async (req: Request, res: Response) => {
-    const userId = req.userId as string
+userRouter.get("/usernames", userMiddleware, async (req: Request, res: Response) => {
+    const users  = await userModel.find({});
 
-    const user  = await userModel.findById(userId);
-
-    if(!user){
+    if(!users){
         res.json({
             msg: "user not found"
         })
         return
     }
+    const allUsers = users.map(u => u.username)
 
-    res.json(user)
+    res.json(allUsers)
 
 })  
 

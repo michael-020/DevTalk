@@ -4,26 +4,12 @@ import { RecievedMessages } from "./RecievedMessages";
 
 export function ChatComp(){
 
-    return <div className=" h-full">
-        <div className="grid grid-cols-2 px-12 overflow-y-scroll h-[26rem] ">
+    return <div className=" h-full bg-gray-50">
+        <div className="grid grid-cols-2 px-12 py-3 overflow-y-scroll h-[26rem] bg-gray-50">
             <div className="col-span-2 justify-self-start">
-                <RecievedMessages content="hello" />
-                <RecievedMessages content="hello" />
-                <RecievedMessages content="hello" />
                 <RecievedMessages content="hello" />
             </div>
             <div className="col-span-2 justify-self-end">
-                <Meessages content="hi" />
-                <Meessages content="hi" />
-
-                <Meessages content="hi" />
-                <Meessages content="hi" />
-                <Meessages content="hi" />
-                <Meessages content="hi" />
-                <Meessages content="hi" />
-                <Meessages content="hi" />
-                <Meessages content="hi" />
-                <Meessages content="hi" />
                 <Meessages content="hi" />
             </div>
         </div>
