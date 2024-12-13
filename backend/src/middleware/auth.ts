@@ -1,9 +1,11 @@
 import { NextFunction, Request, Response } from "express";
 import jwt, { JwtPayload } from "jsonwebtoken"
 import { JWT_PASS } from "./../config"
+import { IUser } from "../model/db";
 
 interface customDecodedInterface {
-    userId?: string
+    // userId?: string;
+    user: IUser
 }
 
 export const userMiddleware = async (req: Request, res: Response, next: NextFunction) => {
@@ -19,7 +21,8 @@ export const userMiddleware = async (req: Request, res: Response, next: NextFunc
     const decoded = jwt.verify(token, JWT_PASS as string) as JwtPayload
 
     if(decoded){
-        req.userId = (decoded as customDecodedInterface).userId
+        // req.userId = (decoded as customDecodedInterface).userId
+        req.user = (decoded as customDecodedInterface).user
         next()
     }
     else{

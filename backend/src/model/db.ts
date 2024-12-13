@@ -2,16 +2,19 @@ import mongoose, { ObjectId } from "mongoose";
 
 const Schema = mongoose.Schema;
 
-interface IUser extends Document {
+export interface IUser extends Document {
+    _id?: mongoose.Types.ObjectId
     username: string;
     password: string;
+    profilePicture: string;
 }
 
 interface IChat extends Document {
     chatRoom: mongoose.Types.ObjectId; 
     sender: mongoose.Types.ObjectId; 
     receiver: mongoose.Types.ObjectId;
-    content: string; 
+    content?: string; 
+    image?: string;
     createdAt: Date;
     updatedAt: Date;
 }
@@ -25,7 +28,8 @@ export interface IChatRoom extends Document {
 
 const userSchema = new Schema<IUser>({
     username: {type: String, unique: true},
-    password: {type: String}
+    password: {type: String},
+    profilePicture: {type: String, default: ""}
 })
 
 const chatSchema = new Schema<IChat>({
@@ -44,8 +48,11 @@ const chatSchema = new Schema<IChat>({
         ref: "users"
     },
     content: { 
-        type: String, 
-        required: true 
+        type: String
+    },
+    image: {
+        type: String,
+        default: ""
     }
 }, { 
     timestamps: true 
