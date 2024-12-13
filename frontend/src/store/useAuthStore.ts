@@ -24,6 +24,8 @@ interface userState {
     }) => void;
 
     logout: () => void;
+
+    updateProfile: (data:{ profilePic: string }) => void;
 }
 
 export const useAuthStore = create<userState>((set) => ({ // this is set function to change state of the function
@@ -82,6 +84,24 @@ export const useAuthStore = create<userState>((set) => ({ // this is set functio
         } catch (error:any) {
             toast.error(error.response.data.messages)
             console.error("error while loggin out")
+        }
+    },
+
+    updateProfile: async (data: { profilePic: string}) => {
+        set({ isUpdatingProfile: true });
+        try {
+            // Create FormData to send the image
+            // const formData = new FormData();
+            // formData.append('profilePic', data.profilePic);
+
+            const res = await axiosInstance.put("/updateProfile", { profilePic: data.profilePic });
+            set({ authUser: res.data });
+            toast.success("Profile updated successfully");
+        } catch (error: any) {
+            console.error("Error in update profile:", error);
+            toast.error(error.response?.data?.message || "Profile update failed");
+        } finally {
+            set({ isUpdatingProfile: false });
         }
     }
 }))
