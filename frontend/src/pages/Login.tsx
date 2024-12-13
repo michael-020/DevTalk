@@ -108,7 +108,7 @@ const login = () => {
                         Loading...
                         </>
                     ) : (
-                        "Create Account"
+                        "Login"
                     )}
                     </button>
                 </form>

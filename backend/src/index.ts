@@ -1,5 +1,3 @@
-import {config} from "dotenv"
-config()
 import express, { Express } from "express"
 import cors from "cors"
 import userRouter from "./routes/user";
@@ -7,6 +5,7 @@ import mongoose from "mongoose";
 import './override';
 import { setUpWebSocketServer } from "./wss/wss";
 import { JWT_PASS } from "./config";
+
 
 
 export const app: Express = express();

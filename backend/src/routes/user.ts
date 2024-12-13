@@ -1,10 +1,8 @@
 import { Request, Response, Router } from "express";
 import { chatModel, chatRoomModel, userModel } from "../model/db";
-import jwt, { JwtPayload } from "jsonwebtoken"
-import { JWT_PASS } from "../config";
 import { userMiddleware } from "../middleware/auth";
-import { authMiddlware } from "../wss/wsMiddleware";
 import cloudinary from "../lib/cloudinary";
+import { generateToken } from "../lib/utils";
 
 const userRouter = Router();
 
@@ -24,6 +22,8 @@ userRouter.post("/signup", async (req: Request, res: Response) => {
         password
     })
 
+    generateToken(newUser._id, res)
+
     res.json({
        _id: newUser._id,
        username: newUser.username,
@@ -42,14 +42,15 @@ userRouter.post("/signin", async (req: Request, res: Response) => {
             res.status(401).json({
                 msg: "Invalid username or password",
             });
+            return
         }
 
-        const token = jwt.sign({
-            user
-        }, JWT_PASS);
+        const token = generateToken(user._id, res)
 
         res.json({
-            token,
+            _id: user?._id,
+            username: user?.username,
+            profilePicture: user?.profilePicture
         });
     } catch (err) {
         console.error("Error during sign-in:", err);
@@ -57,6 +58,16 @@ userRouter.post("/signin", async (req: Request, res: Response) => {
             msg: "An error occurred during sign-in",
         });
     }
+})
+
+userRouter.post("/logout", (req: Request, res: Response) => {
+    try {
+        res.cookie("jwt", "", { maxAge: 0 });
+        res.status(200).json({ message: "Logged out successfully" });
+      } catch (error) {
+        console.log("Error in logout controller", error);
+        res.status(500).json({ message: "Internal Server Error" });
+      }
 })
 
 userRouter.post("/updateProfile", userMiddleware, async (req: Request, res: Response) => {

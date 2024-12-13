@@ -1,10 +1,10 @@
 import { NextFunction, Request, Response } from "express";
 import jwt, { JwtPayload } from "jsonwebtoken"
 import { JWT_PASS } from "./../config"
-import { IUser } from "../model/db";
+import { IUser, userModel } from "../model/db";
 
 interface customDecodedInterface {
-    // userId?: string;
+    userId?: string;
     user: IUser
 }
 
@@ -17,16 +17,27 @@ export const userMiddleware = async (req: Request, res: Response, next: NextFunc
         })
         return
     }
+    console.log(JWT_PASS)
 
     const decoded = jwt.verify(token, JWT_PASS as string) as JwtPayload
+    
 
     if(decoded){
+        const user = await userModel.findById((decoded as customDecodedInterface).userId).select("-password")
+
+        if(!user){
+            res.status(400).json({
+                msg: "user not found"
+            })
+            return
+        }
+
         // req.userId = (decoded as customDecodedInterface).userId
-        req.user = (decoded as customDecodedInterface).user
+        req.user = user
         next()
     }
     else{
-        res.json({
+        res.status(400).json({
             msg: "You are not logged in"
         })
         return

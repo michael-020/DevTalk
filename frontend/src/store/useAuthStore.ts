@@ -22,6 +22,8 @@ interface userState {
         username: string;
         password: string;
     }) => void;
+
+    logout: () => void;
 }
 
 export const useAuthStore = create<userState>((set) => ({
@@ -64,10 +66,20 @@ export const useAuthStore = create<userState>((set) => ({
             const res = await axiosInstance.post("/signin", data)
             set({authUser: res.data})
             toast.success("Logged in Successfully")
-        } catch (error) {
-             toast.error((error as AxiosError).message)
+        } catch (error: any) {
+             toast.error(error.response.data.message)
         } finally {
             set({isSigningUp: false})
+        }
+    },
+
+    logout: async () => {
+        try {
+            await axiosInstance.post("/logout")
+            set({ authUser: null })
+            toast.success("Logged out successfully")
+        } catch (error) {
+            console.error("error while loggin out")
         }
     }
 }))
