@@ -11,13 +11,23 @@ const userRouter = Router();
 userRouter.post("/signup", async (req: Request, res: Response) => {
     const {username, password} = req.body
 
-    await userModel.create({
+    const checkUsername = await userModel.findOne({username})
+    if(checkUsername){
+        res.status(400).json({
+            msg: "Username already exists"
+        })
+        return
+    }
+
+    const newUser = await userModel.create({
         username,
         password
     })
 
     res.json({
-        msg: "Signup successful"
+       _id: newUser._id,
+       username: newUser.username,
+       profilePicutre: newUser.profilePicture
     })
 })
 

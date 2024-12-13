@@ -12,7 +12,7 @@ export const userMiddleware = async (req: Request, res: Response, next: NextFunc
     const token = req.header("authorization")
 
     if(!token){
-        res.json({
+        res.status(400).json({
             msg: "token not found"
         })
         return
