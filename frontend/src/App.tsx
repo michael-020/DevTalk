@@ -29,7 +29,7 @@ function App() {
   return (
     <div>
       <Navbar />
-      <BrowserRouter>
+
         <Routes>
           <Route path="/signup" element={!authUser ? <Signup /> : <Navigate to="/" /> } />
           <Route path="/login" element={!authUser ? <Login /> : <Navigate to="/" /> } />
@@ -37,7 +37,7 @@ function App() {
           <Route path="/settings" element={ <Settings /> } />
           <Route path="/profile" element={ authUser ? <Profile /> : <Navigate to="/login" />} />
         </Routes>
-      </BrowserRouter>
+    
 
       <Toaster />
     </div>  

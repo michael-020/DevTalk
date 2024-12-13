@@ -26,7 +26,8 @@ interface userState {
     logout: () => void;
 }
 
-export const useAuthStore = create<userState>((set) => ({
+export const useAuthStore = create<userState>((set) => ({ // this is set function to change state of the function
+    // these are state variables
     authUser: null,
     isSigningUp: false,
     isLogginIn: false,
@@ -78,7 +79,8 @@ export const useAuthStore = create<userState>((set) => ({
             await axiosInstance.post("/logout")
             set({ authUser: null })
             toast.success("Logged out successfully")
-        } catch (error) {
+        } catch (error:any) {
+            toast.error(error.response.data.messages)
             console.error("error while loggin out")
         }
     }
