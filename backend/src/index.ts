@@ -5,11 +5,30 @@ import mongoose from "mongoose";
 import './override';
 import { setUpWebSocketServer } from "./wss/wss";
 import { JWT_PASS } from "./config";
+import bodyParser from "body-parser";
+import cookieParser from "cookie-parser";
 
 
 
 export const app: Express = express();
-app.use(express.json())
+app.use(express.json({ 
+    limit: '100mb'  // Increased limit
+  }));
+  app.use(express.urlencoded({ 
+    limit: '100mb', 
+    extended: true 
+  }));
+  
+  // If using body-parser
+  app.use(bodyParser.json({ 
+    limit: '100mb'  // Match the limit
+  }));
+  app.use(bodyParser.urlencoded({ 
+    limit: '100mb', 
+    extended: true 
+  }));
+app.use(cookieParser())
+
 app.use(cors({
     origin: "http://localhost:5173",
     credentials: true

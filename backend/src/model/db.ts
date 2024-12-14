@@ -7,6 +7,7 @@ export interface IUser extends Document {
     username: string;
     password: string;
     profilePicture: string;
+    createdAt: Date;
 }
 
 interface IChat extends Document {
@@ -30,6 +31,8 @@ const userSchema = new Schema<IUser>({
     username: {type: String, unique: true},
     password: {type: String},
     profilePicture: {type: String, default: ""}
+}, {
+    timestamps: true
 })
 
 const chatSchema = new Schema<IChat>({

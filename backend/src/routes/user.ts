@@ -1,10 +1,16 @@
-import { Request, Response, Router } from "express";
+import express, { Request, Response, Router } from "express";
 import { chatModel, chatRoomModel, userModel } from "../model/db";
 import { userMiddleware } from "../middleware/auth";
 import cloudinary from "../lib/cloudinary";
 import { generateToken } from "../lib/utils";
+import multer from "multer";
+
+
+// const storage = multer.memoryStorage(); // Store file in memory for processing
+// const upload = multer({ storage });
 
 const userRouter = Router();
+userRouter.use(express.json())
 
 userRouter.post("/signup", async (req: Request, res: Response) => {
     const {username, password} = req.body
@@ -50,7 +56,8 @@ userRouter.post("/signin", async (req: Request, res: Response) => {
         res.json({
             _id: user?._id,
             username: user?.username,
-            profilePicture: user?.profilePicture
+            profilePicture: user?.profilePicture,
+            token
         });
     } catch (err) {
         console.error("Error during sign-in:", err);
@@ -70,21 +77,49 @@ userRouter.post("/logout", (req: Request, res: Response) => {
       }
 })
 
-userRouter.post("/updateProfile", userMiddleware, async (req: Request, res: Response) => {
-    const {profilePic} = req.body
-    const userId = req.user._id
+userRouter.put("/updateProfile", userMiddleware, async (req: Request, res: Response) => {
+    try {
+        const profilePic  = req.body.profilePic
+        const userId = req.user._id
 
-    if(!profilePic){
-        res.status(401).json({
-            msg: "profile pic not provided"
+        // if (!req.file) {
+        //     res.status(400).json({ msg: "Profile picture not provided" });
+        //     return
+        //   }
+
+        if(!profilePic){
+            res.status(401).json({
+                msg: "profile pic not provided"
+            })
+            return
+        }
+
+        if (profilePic && profilePic.length > 10 * 1024 * 1024) { // 10MB limit for base64
+            res.status(413).json({
+                msg: "Profile picture is too large"
+            });
+            return
+        }
+
+        // const base64Image = `data:${req.file?.mimetype};base64,${req.file?.buffer.toString("base64")}`;
+        const uploadResponse = await cloudinary.uploader.upload(profilePic, {
+            folder: "profile_pictures", // Optional: organize uploads in a folder
+            transformation: [
+                { width: 500, height: 500, crop: "fill" }, // Optional: resize and crop
+                { quality: "auto" } // Optional: optimize quality
+            ]
+        })
+
+        const updatedUser = await userModel.findByIdAndUpdate(userId, {profilePicture: uploadResponse.url}, {new: true})
+
+        res.status(200).json(updatedUser)
+    } catch (error) {
+        console.error("Error while updating user", error)
+        res.status(500).json({
+            msg: "error while updating user"
         })
     }
-
-    const uploadResponse = await cloudinary.uploader.upload(profilePic)
-
-    const updatedUser = await userModel.findByIdAndUpdate(userId, {profilePicture: uploadResponse.url}, {new: true})
-
-    res.status(200).json(updatedUser)
+    
 })
 
 userRouter.get("/check", userMiddleware, (req: Request, res: Response) => {

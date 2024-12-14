@@ -9,7 +9,7 @@ interface customDecodedInterface {
 }
 
 export const userMiddleware = async (req: Request, res: Response, next: NextFunction) => {
-    const token = req.header("authorization")
+    const token = req.cookies.jwt
 
     if(!token){
         res.status(400).json({
@@ -17,11 +17,9 @@ export const userMiddleware = async (req: Request, res: Response, next: NextFunc
         })
         return
     }
-    console.log(JWT_PASS)
 
     const decoded = jwt.verify(token, JWT_PASS as string) as JwtPayload
     
-
     if(decoded){
         const user = await userModel.findById((decoded as customDecodedInterface).userId).select("-password")
 
@@ -31,7 +29,6 @@ export const userMiddleware = async (req: Request, res: Response, next: NextFunc
             })
             return
         }
-
         // req.userId = (decoded as customDecodedInterface).userId
         req.user = user
         next()
