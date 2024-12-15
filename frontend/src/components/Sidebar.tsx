@@ -47,7 +47,7 @@ const Sidebar = () => {
         
         {users && users.map((user) => (
           <button
-           
+            key={user._id}
             onClick={() => {
               if (user._id) setSelectedUser(user as IUser);
               else console.error("User ID is missing or invalid");

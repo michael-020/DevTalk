@@ -159,10 +159,10 @@ userRouter.get("/getMessages/:id", userMiddleware, async (req: Request, res: Res
     const userId = req.user._id
     const user2Id = req.params.id
 
-    if (!mongoose.Types.ObjectId.isValid(userId as mongoose.Types.ObjectId)) {
-        res.status(400).json({ message: "Invalid user ID" });
-        return
-    }
+    // if (!mongoose.Types.ObjectId.isValid(userId as mongoose.Types.ObjectId)) {
+    //     res.status(400).json({ message: "Invalid user ID" });
+    //     return
+    // }
 
     const user  = await userModel.findById(userId);
     const user2 = await userModel.findById(user2Id)

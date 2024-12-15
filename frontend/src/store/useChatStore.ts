@@ -4,7 +4,7 @@ import toast from "react-hot-toast";
 import mongoose from "mongoose"
 
 export interface IUser {
-    _id: mongoose.Types.ObjectId | string; 
+    _id:/* mongoose.Types.ObjectId | */string; 
     username: string;
     profilePicture: string;
 }
@@ -46,7 +46,6 @@ export const useChatStore = create<IChatStore>((set) => ({
         set({isUsersLoading: true})
         try {
             const res = await axiosInstance.get("/usernames")
-            console.log(res.data);
             set({users: res.data.users})
         } catch (error: any) {
             toast.error(error.response.data.message)
@@ -62,10 +61,10 @@ export const useChatStore = create<IChatStore>((set) => ({
         }
         set({isMessagesLoading: true})
         try {
-            if(userId){
-                const res = await axiosInstance.get(`/getMessages/${userId}`)
-                set({messages: res.data.messages})
-            }
+            
+            const res = await axiosInstance.get(`/getMessages/${userId}`)
+            set({messages: res.data.messages})
+            
         } catch (error: any) {
             toast.error(error.response.data.message)
         } finally {
