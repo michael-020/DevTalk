@@ -2,14 +2,15 @@ import { create } from "zustand";
 import { axiosInstance } from "../lib/axios";
 import toast from "react-hot-toast";
 import { AxiosError } from "axios";
+import { IUser } from "./useChatStore";
 
 interface userState {
-    authUser: any;
+    authUser: IUser | null;
     isSigningUp: boolean;
     isLogginIn: boolean;
     isUpdatingProfile: boolean;
-     
     isCheckingAuth: boolean;
+    onlineUsers: IUser[]
 
     checkAuth: () => void;
 
@@ -34,8 +35,8 @@ export const useAuthStore = create<userState>((set) => ({ // this is set functio
     isSigningUp: false,
     isLogginIn: false,
     isUpdatingProfile: false,
-     
     isCheckingAuth: true,
+    onlineUsers: [],
 
     checkAuth: async () => {
         try {
