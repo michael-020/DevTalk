@@ -4,8 +4,8 @@
 
 
 
-export const JWT_PASS= "Pass"
+export const JWT_PASS = process.env.JWT_SECRET as string
 
-export const CLOUDINARY_CLOUD_NAME="dujvopjdi"
-export const CLOUDINARY_API_KEY="581327776689137"
-export const CLOUDINARY_API_SECRET="afuq4RXqi1bTyLrsmOu9-VYfQZk"
+export const CLOUDINARY_CLOUD_NAME = process.env.CLOUDINARY_CLOUD_NAME as string;
+export const CLOUDINARY_API_KEY = process.env.CLOUDINARY_API_KEY as string;
+export const CLOUDINARY_API_SECRET = process.env.CLOUDINARY_API_SECRET as string; 

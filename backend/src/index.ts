@@ -1,3 +1,5 @@
+import dotenv from "dotenv"
+dotenv.config()
 import express, { Express } from "express"
 import cors from "cors"
 import userRouter from "./routes/user";
@@ -8,7 +10,7 @@ import { JWT_PASS } from "./config";
 import bodyParser from "body-parser";
 import cookieParser from "cookie-parser";
 
-
+console.log(JWT_PASS)
 
 export const app: Express = express();
 app.use(express.json({ 
