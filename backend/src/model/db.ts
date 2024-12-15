@@ -3,7 +3,7 @@ import mongoose, { ObjectId } from "mongoose";
 const Schema = mongoose.Schema;
 
 export interface IUser extends Document {
-    _id?: mongoose.Types.ObjectId
+    _id: mongoose.Types.ObjectId;
     username: string;
     password: string;
     profilePicture: string;
@@ -11,6 +11,7 @@ export interface IUser extends Document {
 }
 
 interface IChat extends Document {
+    _id: mongoose.Types.ObjectId;
     chatRoom: mongoose.Types.ObjectId; 
     sender: mongoose.Types.ObjectId; 
     receiver: mongoose.Types.ObjectId;
@@ -21,6 +22,7 @@ interface IChat extends Document {
 }
 
 export interface IChatRoom extends Document {
+    _id: mongoose.Types.ObjectId;
     participants: mongoose.Types.ObjectId[]; 
     messages?: mongoose.Types.ObjectId[]; 
     createdAt: Date;

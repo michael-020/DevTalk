@@ -22,7 +22,7 @@ export function setUpWebSocketServer(httpServer: http.Server, JWT_PASS: string){
     })
 }
 
-const wss = http.createServer()
+const wss = http.createServer();
 
 setUpWebSocketServer(wss, JWT_PASS)
 

@@ -4,6 +4,7 @@ import { userMiddleware } from "../middleware/auth";
 import cloudinary from "../lib/cloudinary";
 import { generateToken } from "../lib/utils";
 import multer from "multer";
+import mongoose from "mongoose";
 
 
 // const storage = multer.memoryStorage(); // Store file in memory for processing
@@ -147,7 +148,7 @@ userRouter.get("/usernames", userMiddleware, async (req: Request, res: Response)
 
     res.json({
         users: users.map(u => ({
-            id: u._id,
+            _id: u._id,
             username: u.username, 
         }))
     });
@@ -157,6 +158,11 @@ userRouter.get("/usernames", userMiddleware, async (req: Request, res: Response)
 userRouter.get("/getMessages/:id", userMiddleware, async (req: Request, res: Response) => {
     const userId = req.user._id
     const user2Id = req.params.id
+
+    if (!mongoose.Types.ObjectId.isValid(userId as mongoose.Types.ObjectId)) {
+        res.status(400).json({ message: "Invalid user ID" });
+        return
+    }
 
     const user  = await userModel.findById(userId);
     const user2 = await userModel.findById(user2Id)
