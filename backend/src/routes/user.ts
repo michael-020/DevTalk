@@ -92,8 +92,7 @@ userRouter.get("/usernames", userMiddleware, async (req: Request, res: Response)
             msg: "Error while getting usernames"
         })
     }
-    
-
 })  
+
 
 export default userRouter

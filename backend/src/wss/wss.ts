@@ -6,10 +6,12 @@ import { chatModel, chatRoomModel, userModel } from "../model/db";
 import { JWT_PASS } from "../config";
 import { authMiddlware } from "./wsMiddleware";
 import { ExtendedWebSocket, FormattedMessage, MessagePayload, MessageTypes } from "./customInterfaces";
-import express from "express"
+import express, { Request, Response } from "express"
 
 const app = express()
 
+// yeh function web socket server ko setup karta hai, http server and jwt pass hota hai isme, auth middleware me http server is upgraded to
+// Websocket server and userId is sent from the jwt
 export function setUpWebSocketServer(httpServer: http.Server, JWT_PASS: string){
     const wss = new WebSocketServer({noServer: true})
 
@@ -20,6 +22,12 @@ export function setUpWebSocketServer(httpServer: http.Server, JWT_PASS: string){
             socket.close(4001, "Unauthorized access")
             return
         }
+        // Add user to online users
+        OnlineUsersManager.addUser(socket.user._id.toString(), socket);
+        
+        // Broadcast updated online users list
+        OnlineUsersManager.broadcastOnlineUsers();
+
         new ChatWebSocket(socket.user._id, socket)
     })
 
@@ -29,11 +37,49 @@ export function setUpWebSocketServer(httpServer: http.Server, JWT_PASS: string){
 
 export const wss = http.createServer(app);
 
-// setUpWebSocketServer(wss, JWT_PASS)
+// Manage online users globally
+class OnlineUsersManager {
+    private static onlineUsers: Map<string, Set<ExtendedWebSocket>> = new Map();
 
-// wss.listen(8080, () => {
-//     console.log("wss listening on port 8080")
-// });
+    static addUser(userId: string, socket: ExtendedWebSocket) {
+        if (!this.onlineUsers.has(userId)) {
+            this.onlineUsers.set(userId, new Set());
+        }
+        this.onlineUsers.get(userId)?.add(socket);
+    }
+
+    static removeUser(userId: string, socket: ExtendedWebSocket) {
+        const userSockets = this.onlineUsers.get(userId);
+        if (userSockets) {
+            userSockets.delete(socket);
+            
+            // If no more sockets for this user, remove the entry
+            if (userSockets.size === 0) {
+                this.onlineUsers.delete(userId);
+            }
+        }
+    }
+
+    static getOnlineUsers(): string[] {
+        return Array.from(this.onlineUsers.keys());
+    }
+
+    static broadcastOnlineUsers() {
+        const onlineUserIds = this.getOnlineUsers();
+        
+        // Broadcast online users to all connected sockets
+        this.onlineUsers.forEach((sockets) => {
+            sockets.forEach((socket) => {
+                if (socket.readyState === WebSocket.OPEN) {
+                    socket.send(JSON.stringify({
+                        type: 'ONLINE_USERS',
+                        data: { onlineUsers: onlineUserIds }
+                    }));
+                }
+            });
+        });
+    }
+}
 
 class ChatWebSocket{
     private userId: mongoose.Types.ObjectId;
@@ -53,6 +99,12 @@ class ChatWebSocket{
         })
         this.socket.on("close", () => {
             console.log("Websocket connection closed")
+
+            // Remove user from online users
+            OnlineUsersManager.removeUser(this.userId.toString(), this.socket);
+            
+            // Broadcast updated online users list
+            OnlineUsersManager.broadcastOnlineUsers();
 
             if(this.socket.user?.chatRoomId){
                 const roomClients = ChatWebSocket.clients.get(this.socket.user.chatRoomId)
@@ -206,5 +258,19 @@ class ChatWebSocket{
         this.socket.send(JSON.stringify(errorPayload));
     }
 }
+
+app.get('/onlineUsers', (req: Request, res: Response) => {
+    try {
+        const onlineUserIds = OnlineUsersManager.getOnlineUsers();
+        
+        // Fetch full user details for online users
+        res.json({ 
+            onlineUsers: onlineUserIds 
+        });
+    } catch (error) {
+        console.error('Error fetching online users:', error);
+        res.status(500).json({ message: 'Error fetching online users' });
+    }
+});
 
 export default app;
