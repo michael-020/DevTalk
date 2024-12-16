@@ -6,7 +6,9 @@ import { chatModel, chatRoomModel, userModel } from "../model/db";
 import { JWT_PASS } from "../config";
 import { authMiddlware } from "./wsMiddleware";
 import { ExtendedWebSocket, FormattedMessage, MessagePayload, MessageTypes } from "./customInterfaces";
+import express from "express"
 
+const app = express()
 
 export function setUpWebSocketServer(httpServer: http.Server, JWT_PASS: string){
     const wss = new WebSocketServer({noServer: true})
@@ -20,15 +22,18 @@ export function setUpWebSocketServer(httpServer: http.Server, JWT_PASS: string){
         }
         new ChatWebSocket(socket.user._id, socket)
     })
+
+    return wss;
+   
 }
 
-const wss = http.createServer();
+export const wss = http.createServer(app);
 
-setUpWebSocketServer(wss, JWT_PASS)
+// setUpWebSocketServer(wss, JWT_PASS)
 
-wss.listen(8080, () => {
-    console.log("wss listening on port 8080")
-});
+// wss.listen(8080, () => {
+//     console.log("wss listening on port 8080")
+// });
 
 class ChatWebSocket{
     private userId: mongoose.Types.ObjectId;
@@ -202,3 +207,4 @@ class ChatWebSocket{
     }
 }
 
+export default app;

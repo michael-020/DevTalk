@@ -5,15 +5,14 @@ import cors from "cors"
 import userRouter from "./routes/user";
 import mongoose from "mongoose";
 import './override';
-import { setUpWebSocketServer } from "./wss/wss";
+import app, { setUpWebSocketServer, wss } from "./wss/wss";
 import { JWT_PASS } from "./config";
 import bodyParser from "body-parser";
 import cookieParser from "cookie-parser";
 import messageRouter from "./routes/messages";
 
-console.log(JWT_PASS)
 
-export const app: Express = express();
+// export const app: Express = express();
 app.use(express.json({ 
     limit: '100mb'  // Increased limit
   }));
@@ -41,27 +40,19 @@ app.use("/api/v1/users", userRouter)
 app.use("/api/v1/messages", messageRouter)
 
 async function main() {
+  try {
     await mongoose.connect("mongodb://localhost:27017/chat-app")
 
     console.log("Connected to db")
+
+    setUpWebSocketServer(wss, JWT_PASS);
+
+    wss.listen(3000, () => {
+      console.log('Server running on port 3000');
+    });
+  } catch (error) {
+    console.error("Error starting server:", error);
+    process.exit(1);
+  }
 }
 main()
-
-const httpServer = app.listen(3000, () => {
-    console.log('Express server running on port 3000');
-});
-
-
-setUpWebSocketServer(httpServer, JWT_PASS);
-
-// const socketServer = wssServer;
-// socketServer.listen(8080, () => {
-//     console.log("Websocket server running on port 8080")
-// })
-
-// httpServer.on('upgrade', (request, socket, head) => {
-//     wss.handleUpgrade(request, socket, head, (ws) => {
-//         wss.emit('connection', ws, request);
-//     });
-// });
-

@@ -1,7 +1,7 @@
 import { create } from "zustand";
 import { axiosInstance } from "../lib/axios";
 import toast from "react-hot-toast";
-import mongoose from "mongoose"
+
 
 export interface IUser {
     _id:/* mongoose.Types.ObjectId | */string; 
@@ -29,7 +29,7 @@ export interface IMessageData {
 interface IChatStore {
     messages: IMessages[],
     users: IUser[],
-    selectedUser: any,
+    selectedUser: IUser | null,
     isUsersLoading: boolean,
     isMessagesLoading: boolean,
 
@@ -37,7 +37,7 @@ interface IChatStore {
 
     getMessages: (userId: string) => void;
 
-    setSelectedUser: (selectedUser: IUser | "") => void;
+    setSelectedUser: (selectedUser: IUser | null) => void;
 
     sendMessage: (messageData: IMessageData) => void;
 }
@@ -80,13 +80,15 @@ export const useChatStore = create<IChatStore>((set, get) => ({
         }
     },
     
-    setSelectedUser: (selectedUser: IUser | "") => set({selectedUser}),
+    setSelectedUser: (selectedUser: IUser | null) => set({selectedUser}),
 
     sendMessage: async (messageData: IMessageData) => {
         const { selectedUser, messages } = get()
         try {
-            const res = await axiosInstance.post(`/messages/${selectedUser._id}`, messageData);
-            set({messages: [...messages, res.data.message ]})
+            if(selectedUser){
+                const res = await axiosInstance.post(`/messages/${selectedUser._id}`, messageData);
+                set({messages: [...messages, res.data.message ]})
+            }
         } catch (error: any) {
             toast.error(error.response.data.message)
         }

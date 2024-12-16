@@ -83,6 +83,7 @@ userRouter.get("/usernames", userMiddleware, async (req: Request, res: Response)
             users: users.map(u => ({
                 _id: u._id,
                 username: u.username, 
+                profilePicture: u.profilePicture
             }))
         });
     } catch (error) {

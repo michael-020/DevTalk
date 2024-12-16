@@ -12,14 +12,14 @@ const ChatHeader = () => {
         <div className="flex items-center gap-3">
           {/* Avatar */}
           <div className="avatar">
-            <div className="size-10 rounded-full relative">
-              <img src={selectedUser.profilePic || "/avatar.png"} alt={selectedUser.username} />
+            <div className="size-10 rounded-full relative border border-gray-400 p-[2px] ">
+              <img className="rounded-full" src={selectedUser?.profilePicture || "/avatar.png"} alt={selectedUser?.username} />
             </div>
           </div>
 
           {/* User info */}
           <div>
-            <h3 className="font-medium">{selectedUser.username}</h3>
+            <h3 className="font-medium">{selectedUser?.username}</h3>
             <p className="text-sm text-base-content/70">
               {/* {onlineUsers.includes(selectedUser._id) ? "Online" : "Offline"} */}
             </p>
@@ -27,7 +27,7 @@ const ChatHeader = () => {
         </div>
 
         {/* Close button */}
-        <button onClick={() => setSelectedUser("")}>
+        <button onClick={() => setSelectedUser(null)}>
           <X />
         </button>
       </div>

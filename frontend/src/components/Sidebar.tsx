@@ -58,11 +58,11 @@ const Sidebar = () => {
               ${selectedUser?._id === user._id ? "bg-base-300 ring-1 ring-base-300" : ""}
             `}
           >
-            <div className="relative mx-auto lg:mx-0">
+            <div className="relative mx-auto lg:mx-0 border border-gray-400 rounded-full p-[1px] ">
               <img
                 src={user.profilePicture || "/avatar.png"}
                 alt={user.username}
-                className="size-12 object-cover rounded-full"
+                className="size-12 object-cover rounded-full "
               />
               {/* {onlineUsers.includes(user._id) && (
                 <span
