@@ -7,6 +7,7 @@ export interface IUser {
     _id:/* mongoose.Types.ObjectId | */string; 
     username: string;
     profilePicture: string;
+    createdAt: Date
 }
 
 export interface IMessages {
@@ -18,6 +19,11 @@ export interface IMessages {
     image?: string;
     createdAt: Date;
     updatedAt: Date;
+}
+
+export interface IMessageData {
+    content: string,
+    image?: string 
 }
 
 interface IChatStore {
@@ -32,10 +38,12 @@ interface IChatStore {
     getMessages: (userId: string) => void;
 
     setSelectedUser: (selectedUser: IUser | "") => void;
+
+    sendMessage: (messageData: IMessageData) => void;
 }
 
 
-export const useChatStore = create<IChatStore>((set) => ({
+export const useChatStore = create<IChatStore>((set, get) => ({
     messages: [],
     users: [],
     selectedUser: null,
@@ -45,7 +53,7 @@ export const useChatStore = create<IChatStore>((set) => ({
     getUsers: async () => {
         set({isUsersLoading: true})
         try {
-            const res = await axiosInstance.get("/usernames")
+            const res = await axiosInstance.get("/users/usernames")
             set({users: res.data.users})
         } catch (error: any) {
             toast.error(error.response.data.message)
@@ -62,7 +70,7 @@ export const useChatStore = create<IChatStore>((set) => ({
         set({isMessagesLoading: true})
         try {
             
-            const res = await axiosInstance.get(`/getMessages/${userId}`)
+            const res = await axiosInstance.get(`/messages/${userId}`)
             set({messages: res.data.messages})
             
         } catch (error: any) {
@@ -73,4 +81,14 @@ export const useChatStore = create<IChatStore>((set) => ({
     },
     
     setSelectedUser: (selectedUser: IUser | "") => set({selectedUser}),
+
+    sendMessage: async (messageData: IMessageData) => {
+        const { selectedUser, messages } = get()
+        try {
+            const res = await axiosInstance.post(`/messages/${selectedUser._id}`, messageData);
+            set({messages: [...messages, res.data.message ]})
+        } catch (error: any) {
+            toast.error(error.response.data.message)
+        }
+    },
 }))

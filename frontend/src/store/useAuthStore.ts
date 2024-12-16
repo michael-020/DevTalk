@@ -27,6 +27,10 @@ interface userState {
     logout: () => void;
 
     updateProfile: (data:{ profilePic: string }) => void;
+
+    connectSocket: () => void;
+
+    disconnectSocket: () => void;
 }
 
 export const useAuthStore = create<userState>((set) => ({ // this is set function to change state of the function
@@ -40,7 +44,7 @@ export const useAuthStore = create<userState>((set) => ({ // this is set functio
 
     checkAuth: async () => {
         try {
-            const res = await axiosInstance.get("/check")
+            const res = await axiosInstance.get("/users/check")
             set({authUser: res.data})
         } catch (error) {
             console.error("Error in check auth")
@@ -54,7 +58,7 @@ export const useAuthStore = create<userState>((set) => ({ // this is set functio
     signup: async (data: {username: string, password: string}) => {
         set({isSigningUp: true})
         try {
-            const res = await axiosInstance.post("/signup", data)
+            const res = await axiosInstance.post("/users/signup", data)
             set({authUser: res.data})
             toast.success("Account created Successfully")
         } catch (error) {
@@ -67,7 +71,7 @@ export const useAuthStore = create<userState>((set) => ({ // this is set functio
     login: async (data: {username: string, password: string}) => {
         set({isSigningUp: true})
         try {
-            const res = await axiosInstance.post("/signin", data)
+            const res = await axiosInstance.post("/users/signin", data)
             set({authUser: res.data})
             toast.success("Logged in Successfully")
         } catch (error: any) {
@@ -79,7 +83,7 @@ export const useAuthStore = create<userState>((set) => ({ // this is set functio
 
     logout: async () => {
         try {
-            await axiosInstance.post("/logout")
+            await axiosInstance.post("/users/logout")
             set({ authUser: null })
             toast.success("Logged out successfully")
         } catch (error:any) {
@@ -95,7 +99,7 @@ export const useAuthStore = create<userState>((set) => ({ // this is set functio
             // const formData = new FormData();
             // formData.append('profilePic', data.profilePic);
 
-            const res = await axiosInstance.put("/updateProfile", { profilePic: data.profilePic });
+            const res = await axiosInstance.put("/users/updateProfile", { profilePic: data.profilePic });
             set({ authUser: res.data });
             toast.success("Profile updated successfully");
         } catch (error: any) {
@@ -104,5 +108,13 @@ export const useAuthStore = create<userState>((set) => ({ // this is set functio
         } finally {
             set({ isUpdatingProfile: false });
         }
-    }
+    },
+
+    connectSocket: () => {
+
+    },
+
+    disconnectSocket: () => {
+
+    },
 }))

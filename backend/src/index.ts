@@ -9,6 +9,7 @@ import { setUpWebSocketServer } from "./wss/wss";
 import { JWT_PASS } from "./config";
 import bodyParser from "body-parser";
 import cookieParser from "cookie-parser";
+import messageRouter from "./routes/messages";
 
 console.log(JWT_PASS)
 
@@ -36,7 +37,8 @@ app.use(cors({
     credentials: true
 }))
 
-app.use("/api/v1/user", userRouter)
+app.use("/api/v1/users", userRouter)
+app.use("/api/v1/messages", messageRouter)
 
 async function main() {
     await mongoose.connect("mongodb://localhost:27017/chat-app")

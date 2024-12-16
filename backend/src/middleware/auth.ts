@@ -18,7 +18,7 @@ export const userMiddleware = async (req: Request, res: Response, next: NextFunc
         return
     }
 
-    const decoded = jwt.verify(token, JWT_PASS as string) as JwtPayload
+    const decoded = jwt.verify(token, JWT_PASS) as JwtPayload
     
     if(decoded){
         const user = await userModel.findById((decoded as customDecodedInterface).userId).select("-password")

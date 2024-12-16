@@ -3,6 +3,8 @@ import { useChatStore } from "../store/useChatStore"
 import MessageInput from "./MessageInput"
 import { useAuthStore } from "../store/useAuthStore"
 import ChatHeader from "./ChatHeader"
+import { formatMessageTime } from "../lib/utils"
+import { Loader } from "lucide-react"
 
 
 const ChatContainer = () => {
@@ -15,8 +17,8 @@ const ChatContainer = () => {
   }, [getMessages, selectedUser._id])
 
   if(isMessagesLoading){
-    return <div>
-      Loading....
+    return <div className="animate-spin h-full w-full flex items-center justify-center">
+     <Loader />
     </div>
   }
 
@@ -37,7 +39,7 @@ const ChatContainer = () => {
                 src={
                   message.sender === authUser?._id
                     ? authUser?.profilePicture || "/avatar.png"
-                    : selectedUser.profilePicture || "/avatar.png"
+                    : selectedUser.profilePic || "/avatar.png"
                 }
                 alt="profile pic"
               />
@@ -45,7 +47,8 @@ const ChatContainer = () => {
           </div>
           <div className="chat-header mb-1">
             <time className="text-xs opacity-50 ml-1">
-              {/* {formatMessageTime(message.createdAt)} */}
+              {/* {message.createdAt.toString()} */}
+              {formatMessageTime(message.createdAt)}
             </time>
           </div>
           <div className="chat-bubble flex flex-col">
