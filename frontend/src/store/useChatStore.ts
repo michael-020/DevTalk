@@ -1,7 +1,7 @@
 import { create } from "zustand";
 import { axiosInstance } from "../lib/axios";
 import toast from "react-hot-toast";
-import { MessageTypes, useAuthStore } from "./useAuthStore";
+import { useAuthStore } from "./useAuthStore";
 
 export interface IUser {
     _id: string;
@@ -109,7 +109,7 @@ export const useChatStore = create<IChatStore>((set, get) => ({
         // set((state) => ({
         //     messages: [...state.messages, message],
         // }));
-        const { selectedUser, messages } = get();
+        const { selectedUser } = get();
         if (selectedUser && message.sender === selectedUser._id) {
             set((state) => ({
                 messages: [...state.messages, message]

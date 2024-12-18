@@ -10,9 +10,9 @@ import { JWT_PASS } from "./config";
 import bodyParser from "body-parser";
 import cookieParser from "cookie-parser";
 import messageRouter from "./routes/messages";
-import path from "path"
+// import path from "path"
 
-const __dirname = path.resolve()
+// const __dirname = path.resolve()
 
 // export const app: Express = express();
 app.use(express.json({ 
@@ -41,13 +41,13 @@ app.use(cors({
 app.use("/api/v1/users", userRouter)
 app.use("/api/v1/messages", messageRouter)
 
-if(process.env.NODE_ENV === "production"){
-  app.use(express.static(path.join(__dirname, "../frontend/dist")))
+// if(process.env.NODE_ENV === "production"){
+//   app.use(express.static(path.join(__dirname, "../frontend/dist")))
 
-  app.get("*", (req: Request, res: Response) => {
-    res.sendFile(path.join(__dirname, "../frontend", "dist", "index.html"))
-  })
-}
+//   app.get("*", (req: Request, res: Response) => {
+//     res.sendFile(path.join(__dirname, "../frontend", "dist", "index.html"))
+//   })
+// }
 
 async function main() {
   try {

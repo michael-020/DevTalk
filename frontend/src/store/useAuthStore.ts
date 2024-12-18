@@ -2,7 +2,7 @@ import { create } from "zustand";
 import { axiosInstance } from "../lib/axios";
 import toast from "react-hot-toast";
 import { AxiosError } from "axios";
-import { IMessages, IUser, useChatStore } from "./useChatStore";
+import { IUser, useChatStore } from "./useChatStore";
 
 export enum MessageTypes {
     ENTER_ROOM = 'ENTER_ROOM',
