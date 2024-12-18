@@ -8,20 +8,33 @@ import { Loader } from "lucide-react"
 
 
 const ChatContainer = () => {
-  const {messages, getMessages, isMessagesLoading, selectedUser} = useChatStore()
+  const {messages, getMessages, isMessagesLoading, selectedUser, subscribeToMessages, unSubscribeFromMessages} = useChatStore()
   const { authUser } = useAuthStore()
-  const messageEndRef = useRef(null);
+  const messageEndRef = useRef<HTMLDivElement>(null);
 
   if(selectedUser)
     useEffect(() => {
       getMessages(selectedUser._id)
-    }, [getMessages, selectedUser._id])
+
+      subscribeToMessages()
+
+      return () => unSubscribeFromMessages();
+    }, [getMessages, selectedUser._id, subscribeToMessages, unSubscribeFromMessages])
+
+    useEffect(() => {
+      if(messageEndRef.current && messages){
+        messageEndRef.current.scrollIntoView({behavior: "smooth"})
+        // messageEndRef.current?.lastElementChild?.scrollIntoView({ behavior: "smooth"})
+      }
+    }, [messages])
 
   if(isMessagesLoading){
     return <div className="animate-spin h-full w-full flex items-center justify-center">
      <Loader />
     </div>
   }
+
+  
 
   return (
     <div className="flex-1 flex flex-col overflow-auto">

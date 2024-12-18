@@ -1,56 +1,48 @@
 import { create } from "zustand";
 import { axiosInstance } from "../lib/axios";
 import toast from "react-hot-toast";
-import { MessageTypes, socket, useAuthStore } from "./useAuthStore";
-
+import { MessageTypes, useAuthStore } from "./useAuthStore";
 
 export interface IUser {
-    _id:/* mongoose.Types.ObjectId | */string; 
+    _id: string;
     username: string;
     profilePicture: string;
-    createdAt: Date
+    createdAt: Date;
 }
 
 export interface IMessages {
-    _id: string
-    chatRoom: string; 
-    sender: any; 
-    receiver: string;
-    content?: string; 
+    _id: string;
+    roomId: string;
+    sender: any;
+    receiver?: string;
+    content?: string;
     image?: string;
     createdAt: Date;
     updatedAt?: Date;
 }
 
 export interface IMessageData {
-    content: string,
-    image?: string 
+    content: string;
+    image?: string;
 }
 
 interface IChatStore {
-    messages: IMessages[],
-    users: IUser[],
-    selectedUser: IUser | null,
-    isUsersLoading: boolean,
-    isMessagesLoading: boolean,
+    messages: IMessages[];
+    users: IUser[];
+    selectedUser: IUser | null;
+    isUsersLoading: boolean;
+    isMessagesLoading: boolean;
 
-    getUsers: () => void,
-
-    getMessages: (userId: string) => void;
-
+    getUsers: () => Promise<void>;
+    getMessages: (userId: string) => Promise<void>;
     setSelectedUser: (selectedUser: IUser | null) => void;
+    sendMessage: (messageData: IMessageData) => Promise<void>;
+    addIncomingMessage: (message: IMessages) => void;
 
-    sendMessage: (messageData: IMessageData) => void;
+    subscribeToMessages: () => void;
 
-    addMessage: (message: IMessages) => void;
-
-    subscribeToMessages: (otherUserId: string) => void;
-
-    sendMessageWs: (messageData: IMessageData) => void;
-
-    unsubscirbeFromMessages: () => void;
+    unSubscribeFromMessages: () => void;
 }
-
 
 export const useChatStore = create<IChatStore>((set, get) => ({
     messages: [],
@@ -60,116 +52,94 @@ export const useChatStore = create<IChatStore>((set, get) => ({
     isMessagesLoading: false,
 
     getUsers: async () => {
-        set({isUsersLoading: true})
+        set({ isUsersLoading: true });
         try {
-            const res = await axiosInstance.get("/users/usernames")
-            set({users: res.data.users})
+            const res = await axiosInstance.get("/users/usernames");
+            set({ users: res.data.users });
         } catch (error: any) {
-            toast.error(error.response.data.message)
+            toast.error(error.response?.data?.message || "Error fetching users");
         } finally {
-            set({ isUsersLoading: false})
+            set({ isUsersLoading: false });
         }
     },
 
     getMessages: async (userId: string) => {
         if (!userId) {
-            toast.error("User ID is required to fetch messages");
+            // toast.error("User ID is required to fetch messages");
             return;
         }
-        set({isMessagesLoading: true})
+        set({ isMessagesLoading: true });
         try {
-            
-            const res = await axiosInstance.get(`/messages/${userId}`)
-            set({messages: res.data.messages})
-            
+            const res = await axiosInstance.get(`/messages/${userId}`);
+            set({ messages: res.data.messages });
         } catch (error: any) {
-            toast.error(error.response.data.message)
+            // toast.error(error.response?.data?.message || "Error fetching messages");
         } finally {
-            set({ isMessagesLoading: false})
+            set({ isMessagesLoading: false });
         }
     },
-    
-    setSelectedUser: (selectedUser: IUser | null) => set({selectedUser}),
+
+    setSelectedUser: (selectedUser: IUser | null) => set({ selectedUser }),
 
     sendMessage: async (messageData: IMessageData) => {
-        const { selectedUser, messages } = get()
-        try {
-            if(selectedUser){
-                const res = await axiosInstance.post(`/messages/${selectedUser._id}`, messageData);
-                set({messages: [...messages, res.data.message ]})
-            }
-        } catch (error: any) {
-            toast.error(error.response.data.message)
-        }
-    },
-
-    addMessage: (message) => {
-        set(state => ({
-            messages: [...state.messages, {
-                _id: Date.now().toString(), // Temporary ID
-                chatRoom: '', // You might want to populate this
-                sender: message.sender.userId,
-                receiver: '', // You might want to populate this
-                content: message.content,
-                createdAt: new Date(message.createdAt)
-            }]
-        }));
-    },
-
-    // Subscribe to messages for a specific user/room
-    subscribeToMessages: (otherUserId: string) => {
-        // Use the auth store's enterChatRoom method
-        useAuthStore.getState().enterChatRoom(otherUserId);
-    },
-
-    // Send a message via WebSocket
-    sendMessageWs: async (messageData: IMessageData) => {
         const { selectedUser, messages } = get();
-        
-        if (!socket || socket.readyState !== WebSocket.OPEN) {
-            toast.error("Chat connection not established");
+        if (!selectedUser) {
+            // toast.error("No user selected");
             return;
         }
-
         try {
-            if (selectedUser) {
-                const payload = {
-                    type: MessageTypes.CHAT,
-                    data: {
-                        content: messageData.content,
-                        chatRoomId: selectedUser._id // Assuming _id is the chatRoomId
-                    }
-                };
+            const res = await axiosInstance.post(`/messages/${selectedUser._id}`, messageData);
+            set({ messages: [...messages, res.data.message] });
 
-                socket.send(JSON.stringify(payload));
-
-                // Optimistically add the message to the local state
-                set({
-                    messages: [...messages, {
-                        _id: Date.now().toString(), // Temporary ID
-                        chatRoom: selectedUser._id,
-                        sender: useAuthStore.getState().authUser?._id || '',
-                        receiver: selectedUser._id,
-                        content: messageData.content,
-                        createdAt: new Date()
-                    }]
-                });
+            const socket = useAuthStore.getState().socket;
+            if (socket) {
+              socket.send(
+                JSON.stringify({
+                  type: "SEND_MESSAGE",
+                  payload: res.data,
+                })
+              );
             }
         } catch (error: any) {
-            toast.error(error.message);
+            // toast.error(error.response?.data?.message || "Error sending message");
         }
     },
 
-    // Unsubscribe from messages (close the current room)
-    unsubscirbeFromMessages: () => {
-        if (socket && socket.readyState === WebSocket.OPEN) {
-            const payload = {
-                type: MessageTypes.LEAVE,
-                data: {}
-            };
+    addIncomingMessage: (message: IMessages) => {
+        // set((state) => ({
+        //     messages: [...state.messages, message],
+        // }));
+        const { selectedUser, messages } = get();
+        if (selectedUser && message.sender === selectedUser._id) {
+            set((state) => ({
+                messages: [...state.messages, message]
+            }));
+        }
+    },
 
-            socket.send(JSON.stringify(payload));
+    subscribeToMessages: () => {
+        const { selectedUser } = get();
+        if (!selectedUser) return;
+
+        const socket = useAuthStore.getState().socket;
+        if (!socket) return;
+
+        socket.onmessage = (event) => {
+            const { type, payload } = JSON.parse(event.data);
+
+            if (type === "NEW_MESSAGE" && payload.sender === selectedUser._id) {
+                const isMessageSentFromSelectedUser = payload.sender === selectedUser._id;
+                if (!isMessageSentFromSelectedUser) return;
+
+                set({ messages: [...get().messages, payload] });
+            }
+        };
+    },
+
+    unSubscribeFromMessages: () => {
+        const socket = useAuthStore.getState().socket;
+        if (socket) {
+          socket.onmessage = null; // Clear WebSocket event handler
         }
     }
-
-}))
+}));

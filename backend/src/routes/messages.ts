@@ -2,6 +2,7 @@ import  { Request, Response, Router } from "express";
 import { chatModel, chatRoomModel, userModel } from "../model/db";
 import { userMiddleware } from "../middleware/auth";
 import cloudinary from "../lib/cloudinary";
+import { userSocketMap } from "../wss/wss";
 
 
 const messageRouter = Router()
@@ -90,6 +91,12 @@ messageRouter.post("/:id", userMiddleware, async (req: Request, res: Response) =
         await chatRoom.save();
 
         // todo: real time functionality
+        const receiverWs = userSocketMap[otherUserId];
+        if (receiverWs && receiverWs.readyState === WebSocket.OPEN) {
+          receiverWs.send(
+            JSON.stringify({ type: "NEW_MESSAGE", payload: message })
+          );
+        }
     
         res.status(200).json({
             msg: "Message sent",

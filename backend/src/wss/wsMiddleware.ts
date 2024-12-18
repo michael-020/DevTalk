@@ -10,11 +10,18 @@ export function authMiddlware(httpServer: http.Server, wss: WebSocketServer, JWT
    
     httpServer.on("upgrade", async (request, socket, head) => {
         try{
+            // const url = new URL(request.url || "", `http://${request.headers.host}`);
+            // const token = request.headers["authorization"]?.split(" ")[1] || url.searchParams.get("token")
+
             const url = new URL(request.url || "", `http://${request.headers.host}`);
-            const token = request.headers["authorization"]?.split(" ")[1] || url.searchParams.get("token")
+            const token = url.searchParams.get("token");
+
+            console.log("Authorization header:", request.headers["authorization"]);
+            console.log("Query token:", url.searchParams.get("token"));
+            console.log("Final token:", token);
 
             if(!token){
-                console.error("token not found");
+                console.error("token not found in ws");
                 socket.write("Token not found")
                 socket.destroy()
                 return

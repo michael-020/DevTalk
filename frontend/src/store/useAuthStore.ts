@@ -2,7 +2,7 @@ import { create } from "zustand";
 import { axiosInstance } from "../lib/axios";
 import toast from "react-hot-toast";
 import { AxiosError } from "axios";
-import { IUser, useChatStore } from "./useChatStore";
+import { IMessages, IUser, useChatStore } from "./useChatStore";
 
 export enum MessageTypes {
     ENTER_ROOM = 'ENTER_ROOM',
@@ -10,7 +10,7 @@ export enum MessageTypes {
     LEAVE = 'LEAVE'
 }
 
-export let socket: WebSocket | null = null;
+export let socket: WebSocket | null  = null;
 
 interface userState {
     authUser: IUser | null;
@@ -18,32 +18,29 @@ interface userState {
     isLogginIn: boolean;
     isUpdatingProfile: boolean;
     isCheckingAuth: boolean;
-    onlineUsers: IUser[]
+    onlineUsers: string[];
+    socket: WebSocket | null;
+    
 
     checkAuth: () => void;
-
     signup: (data : {
         username: string;
         password: string;
     }) => void;
-
     login: (data : {
         username: string;
         password: string;
     }) => void;
-
     logout: () => void;
-
     updateProfile: (data:{ profilePic: string }) => void;
-
     connectSocket: () => void;
 
-    enterChatRoom: (otherUserId: string) => void;
-
     fetchOnlineUsers: () => void;
-
     disconnectSocket: () => void;
+    getSocket: () => WebSocket | null; 
 }
+
+const BASE_URL = import.meta.env.MODE === "development" ? "ws://localhost:3000" : "/";
 
 export const useAuthStore = create<userState>((set, get) => ({ // this is set function to change state of the function
     // these are state variables
@@ -53,7 +50,9 @@ export const useAuthStore = create<userState>((set, get) => ({ // this is set fu
     isUpdatingProfile: false,
     isCheckingAuth: true,
     onlineUsers: [],
+    socket: null,
 
+   
 
     checkAuth: async () => {
         try {
@@ -115,12 +114,10 @@ export const useAuthStore = create<userState>((set, get) => ({ // this is set fu
     updateProfile: async (data: { profilePic: string}) => {
         set({ isUpdatingProfile: true });
         try {
-            // Create FormData to send the image
-            // const formData = new FormData();
-            // formData.append('profilePic', data.profilePic);
-
             const res = await axiosInstance.put("/users/updateProfile", { profilePic: data.profilePic });
+
             set({ authUser: res.data });
+
             toast.success("Profile updated successfully");
         } catch (error: any) {
             console.error("Error in update profile:", error);
@@ -130,93 +127,71 @@ export const useAuthStore = create<userState>((set, get) => ({ // this is set fu
         }
     },
 
+   
     connectSocket: () => {
         const { authUser } = get();
-        
-        // Disconnect existing socket if any
-        get().disconnectSocket();
+        if (!authUser || get().socket) return;
 
-        if (!authUser) return;
-
-        // Create new WebSocket connection
-        socket = new WebSocket(`ws://localhost:3000/ws`);
+        const socket = new WebSocket(`${BASE_URL}?userId=${authUser._id}`);
 
         socket.onopen = () => {
             console.log("WebSocket connection established");
-            toast.success("Connected to chat server");
-
-            // Fetch initial online users
-            get().fetchOnlineUsers();
+            set({ socket });
         };
 
         socket.onmessage = (event) => {
             try {
-                const message = JSON.parse(event.data);
+                const { type, payload } = JSON.parse(event.data);
+    
+                switch(type) {
+                    case "ONLINE_USERS":
+                         // Update the online users in the state
+                        set({ onlineUsers: payload });
+                        break;
+                    case "NEW_MESSAGE":
+                        const chatStore = useChatStore.getState();
+                        chatStore.addIncomingMessage({
+                            _id: Date.now().toString(), // temporary ID
+                            content: payload.content,
+                            sender: payload.senderId, 
+                            receiver: payload.recieverId,
+                            roomId: payload.roomId,
+                            createdAt: new Date()
+                        });
 
-                // Handle different message types
-                if (message.content && message.user) {
-                    // Chat message
-                    useChatStore.getState().addMessage(message);
-                    toast.success(`New message from ${message.user.username}`);
-                } else if (message.type === 'ONLINE_USERS') {
-                    // Update online users
-                    set({ onlineUsers: message.data.onlineUsers });
+                        break;
                 }
             } catch (error) {
                 console.error("Error parsing WebSocket message:", error);
             }
         };
 
-        socket.onerror = (error) => {
-            console.error("WebSocket error:", error);
-            toast.error("Chat connection error");
+        
+
+        socket.onclose = () => {
+            console.log("WebSocket connection closed");
+            set({ socket: null });
         };
 
-        socket.onclose = (event) => {
-            console.log("WebSocket connection closed", event);
-            
-            // Attempt to reconnect if not intentionally closed
-            if (event.code !== 1000 && authUser) {
-                toast.error("Chat connection lost. Reconnecting...");
-                setTimeout(() => get().connectSocket(), 3000);
-            }
-
-            // Clear online users when disconnected
-            set({ onlineUsers: [] });
+        socket.onerror = (error) => {
+            console.error("WebSocket error:", error);
         };
     },
 
+    
     // Fetch online users from the server
     fetchOnlineUsers: async () => {
-        try {
-            const res = await axiosInstance.get("/onlineUsers");
-            set({ onlineUsers: res.data.onlineUsers });
-        } catch (error: any) {
-            console.error("Error fetching online users:", error);
-            toast.error("Failed to fetch online users");
-        }
+       
     },
 
     disconnectSocket: () => {
+        const { socket } = get();
         if (socket) {
-            socket.close(1000, "User disconnected");
-            socket = null;
+            socket.close();
+            set({ socket: null });
         }
     },
 
-    // Method to enter a chat room
-    enterChatRoom: (otherUserId: string) => {
-        if (!socket || socket.readyState !== WebSocket.OPEN) {
-            toast.error("Chat connection not established");
-            return;
-        }
-
-        const payload = {
-            type: MessageTypes.ENTER_ROOM,
-            data: { otherUserId }
-        };
-
-        socket.send(JSON.stringify(payload));
-    },
-
+   
+    getSocket: () => get().socket, 
 }))
