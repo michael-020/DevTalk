@@ -1,17 +1,9 @@
-import mongoose from "mongoose";
 import WebSocket, { WebSocketServer } from "ws";
 import http from "http"
-import jwt from "jsonwebtoken"
-import { chatModel, chatRoomModel, userModel } from "../model/db";
-import { JWT_PASS } from "../config";
-import { authMiddlware } from "./wsMiddleware";
-import { ExtendedWebSocket, FormattedMessage, MessagePayload, MessageTypes } from "./customInterfaces";
-import express, { Request, Response } from "express"
-import { ClientHttp2Session } from "http2";
-import cloudinary from "../lib/cloudinary";
+import express from "express"
 
 const app = express()
-export const wss = http.createServer(app);
+export const server = http.createServer(app);
 export default app;
 
 // yeh function web socket server ko setup karta hai, http server and jwt pass hota hai isme, auth middleware me http server is upgraded to
@@ -275,7 +267,7 @@ const socketServer = new WebSocketServer({noServer: true})
 export const userSocketMap: Record<string, WebSocket> = {}; // { userId: socket }
 
 // Add this crucial upgrade handler
-wss.on('upgrade', (request, socket, head) => {
+server.on('upgrade', (request, socket, head) => {
     const url = new URL(request.url || "", `http://${request.headers.host}`);
     const userId = url.searchParams.get("userId");
 

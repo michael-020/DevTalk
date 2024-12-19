@@ -1,11 +1,11 @@
 import dotenv from "dotenv"
 dotenv.config()
-import express, { Express, Request, Response, response } from "express"
+import express from "express"
 import cors from "cors"
 import userRouter from "./routes/user";
 import mongoose from "mongoose";
 import './override';
-import app, { wss } from "./wss/wss";
+import app, { server } from "./wss/wss";
 import { JWT_PASS } from "./config";
 import bodyParser from "body-parser";
 import cookieParser from "cookie-parser";
@@ -57,7 +57,7 @@ async function main() {
 
     // setUpWebSocketServer(wss, JWT_PASS);
 
-    wss.listen(3000, () => {
+    server.listen(3000, () => {
       console.log('Server running on port 3000');
     });
   } catch (error) {
