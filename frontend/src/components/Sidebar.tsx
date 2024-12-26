@@ -1,9 +1,9 @@
 import { useEffect, useState } from "react";
-import { IUser, useChatStore } from "../store/useChatStore";
+import { IUser, useChatStore } from "../store/chatStore/useChatStore";
 // import { useAuthStore } from "../store/useAuthStore";
 import SidebarSkeleton from "./skeletons/SidebarSkeleton";
 import { Users } from "lucide-react";
-import { useAuthStore } from "../store/useAuthStore";
+import { useAuthStore } from "../store/authStore/useAuthStore";
 // import { useAuthStore } from "../store/useAuthStore";
 
 const Sidebar = () => {

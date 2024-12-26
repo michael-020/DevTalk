@@ -1,7 +1,8 @@
 import { create } from "zustand";
-import { axiosInstance } from "../lib/axios";
+import { axiosInstance } from "../../lib/axios";
 import toast from "react-hot-toast";
-import { useAuthStore } from "./useAuthStore";
+import { useAuthStore } from "../authStore/useAuthStore";
+import { chatAction, chatState } from "./types";
 
 export interface IUser {
     _id: string;
@@ -44,7 +45,7 @@ interface IChatStore {
     unSubscribeFromMessages: () => void;
 }
 
-export const useChatStore = create<IChatStore>((set, get) => ({
+export const useChatStore = create<chatState & chatAction>((set, get) => ({
     messages: [],
     users: [],
     selectedUser: null,

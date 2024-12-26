@@ -1,5 +1,5 @@
 import { FormEvent, useState } from "react"
-import { useAuthStore } from "../store/useAuthStore"
+import { useAuthStore } from "../store/authStore/useAuthStore"
 import { Eye, EyeOff, Loader2, Lock, MessageSquare, User } from "lucide-react"
 import { useNavigate } from "react-router-dom"
 import { AuthImagePattern } from "../components/AuthImagePattern"

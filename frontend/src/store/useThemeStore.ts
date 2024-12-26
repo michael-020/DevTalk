@@ -1,11 +1,15 @@
 import { create } from "zustand";
 
-interface IThemeStore {
-    theme:string;
-    setTheme: (theme: string) => void;
+type State = {
+    theme: string;
 }
 
-export const useThemeStore = create<IThemeStore>((set) => ({
+type Action = {
+    setTheme: (theme: State["theme"]) => void;
+}
+
+
+export const useThemeStore = create<State & Action>((set) => ({
     theme: localStorage.getItem("chat-theme") || "coffee",
 
     setTheme: (theme: string) => {

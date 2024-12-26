@@ -1,5 +1,5 @@
 import { ChangeEvent, useState } from "react";
-import { useAuthStore } from "../store/useAuthStore"
+import { useAuthStore } from "../store/authStore/useAuthStore"
 import { Camera, User } from "lucide-react";
 
 export const Profile = () => {

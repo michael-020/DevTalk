@@ -277,7 +277,7 @@ server.on('upgrade', (request, socket, head) => {
     }
 
     socketServer.handleUpgrade(request, socket, head, (ws) => {
-        socketServer.emit('connection', ws, request);
+        socketServer.emit('connection', ws, request); // this triggers a connection event
     });
 });
 
@@ -307,7 +307,7 @@ socketServer.on("connection", function connection(socket: CustomWebSocket, req: 
         broadcastOnlineUsers()
     }
     
-    
+
     socket.on("error", console.error)
 
     socket.on("message", async (data: WebSocket.Data) => {
@@ -323,11 +323,11 @@ socketServer.on("connection", function connection(socket: CustomWebSocket, req: 
             else if(parsedMessage.type === "SEND_MESSAGE"){
                 const { roomId, content, image } = parsedMessage.payload;
 
-                // Broadcast the message only; assume HTTP handler stores it in DB
-                socketServer.clients.forEach((client) => {
+                // Broadcast the message only;
+                socketServer.clients.forEach((client) => {  // Iterates over all connected WebSocket clients
                     const customClient = client as CustomWebSocket;
                     if (
-                        customClient.readyState === WebSocket.OPEN &&
+                        customClient.readyState === WebSocket.OPEN && // client is connected and ready to recieve the message
                         customClient.roomId === roomId
                     ) {
                         customClient.send(
@@ -340,7 +340,7 @@ socketServer.on("connection", function connection(socket: CustomWebSocket, req: 
                 });
             }
         } catch (error) {
-            
+            console.error("Error while sending message:", error);
         }
         
     })

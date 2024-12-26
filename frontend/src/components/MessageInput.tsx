@@ -1,7 +1,7 @@
 import { ChangeEvent, FormEvent, useRef, useState } from "react";
 
 import { Image, Send, X } from "lucide-react";
-import { useChatStore } from "../store/useChatStore";
+import { useChatStore } from "../store/chatStore/useChatStore";
 import toast from "react-hot-toast";
 
 

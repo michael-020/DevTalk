@@ -1,8 +1,9 @@
 import { create } from "zustand";
-import { axiosInstance } from "../lib/axios";
+import { axiosInstance } from "../../lib/axios";
 import toast from "react-hot-toast";
 import { AxiosError } from "axios";
-import { IUser, useChatStore } from "./useChatStore";
+import { IUser, useChatStore } from "../chatStore/useChatStore";
+import { authAction, authState } from "./types";
 
 export enum MessageTypes {
     ENTER_ROOM = 'ENTER_ROOM',
@@ -10,39 +11,9 @@ export enum MessageTypes {
     LEAVE = 'LEAVE'
 }
 
-export let socket: WebSocket | null  = null;
-
-interface userState {
-    authUser: IUser | null;
-    isSigningUp: boolean;
-    isLogginIn: boolean;
-    isUpdatingProfile: boolean;
-    isCheckingAuth: boolean;
-    onlineUsers: string[];
-    socket: WebSocket | null;
-    
-
-    checkAuth: () => void;
-    signup: (data : {
-        username: string;
-        password: string;
-    }) => void;
-    login: (data : {
-        username: string;
-        password: string;
-    }) => void;
-    logout: () => void;
-    updateProfile: (data:{ profilePic: string }) => void;
-    connectSocket: () => void;
-
-    fetchOnlineUsers: () => void;
-    disconnectSocket: () => void;
-    getSocket: () => WebSocket | null; 
-}
-
 const BASE_URL = import.meta.env.MODE === "development" ? "ws://localhost:3000" : "/";
 
-export const useAuthStore = create<userState>((set, get) => ({ // this is set function to change state of the function
+export const useAuthStore = create<authState & authAction>((set, get) => ({ // this is set function to change state of the function
     // these are state variables
     authUser: null,
     isSigningUp: false,
