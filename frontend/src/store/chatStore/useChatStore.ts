@@ -27,24 +27,6 @@ export interface IMessageData {
     image?: string;
 }
 
-interface IChatStore {
-    messages: IMessages[];
-    users: IUser[];
-    selectedUser: IUser | null;
-    isUsersLoading: boolean;
-    isMessagesLoading: boolean;
-
-    getUsers: () => Promise<void>;
-    getMessages: (userId: string) => Promise<void>;
-    setSelectedUser: (selectedUser: IUser | null) => void;
-    sendMessage: (messageData: IMessageData) => Promise<void>;
-    addIncomingMessage: (message: IMessages) => void;
-
-    subscribeToMessages: () => void;
-
-    unSubscribeFromMessages: () => void;
-}
-
 export const useChatStore = create<chatState & chatAction>((set, get) => ({
     messages: [],
     users: [],

@@ -2,7 +2,7 @@ import { create } from "zustand";
 import { axiosInstance } from "../../lib/axios";
 import toast from "react-hot-toast";
 import { AxiosError } from "axios";
-import { IUser, useChatStore } from "../chatStore/useChatStore";
+import { useChatStore } from "../chatStore/useChatStore";
 import { authAction, authState } from "./types";
 
 export enum MessageTypes {
