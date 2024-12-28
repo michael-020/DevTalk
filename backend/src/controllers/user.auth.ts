@@ -1,7 +1,7 @@
 import { Request, Response } from "express";
 import { userModel } from "../model/db";
-
 import { generateToken } from "../lib/utils";
+import bcrypt from "bcrypt"
 
 
 export const signupHandler = async (req: Request, res: Response) => {
@@ -15,9 +15,11 @@ export const signupHandler = async (req: Request, res: Response) => {
         return
     }
 
+    const hashedPassword = await bcrypt.hash(password, 5);
+
     const newUser = await userModel.create({
         username,
-        password
+        password: hashedPassword
     })
 
     generateToken(newUser._id, res)
@@ -34,8 +36,7 @@ export const signinHandler = async (req: Request, res: Response) => {
     const { username, password } = req.body;
 
     try {
-        // Find user and check password in one query
-        const user = await userModel.findOne({ username, password }).select("-password");
+        const user = await userModel.findOne({ username })
 
         if (!user) {
             res.status(401).json({
@@ -44,13 +45,25 @@ export const signinHandler = async (req: Request, res: Response) => {
             return
         }
 
+
+        const checkPassword = await bcrypt.compare(password, user.password);
+
+        if (!checkPassword) {
+            res.status(401).json({
+                msg: "Invalid username or password",
+            });
+            return
+        }
+
+        // Remove password from the response
+        user.password = "";
+
         const token = generateToken(user._id, res)
 
         res.json({
             _id: user?._id,
             username: user?.username,
-            profilePicture: user?.profilePicture,
-            token
+            profilePicture: user?.profilePicture
         });
     } catch (err) {
         console.error("Error during sign-in:", err);
