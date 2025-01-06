@@ -4,6 +4,7 @@ import { Eye, EyeOff, Loader2, Lock, MessageSquare, User } from "lucide-react"
 import { useNavigate } from "react-router-dom"
 import { AuthImagePattern } from "../components/AuthImagePattern"
 import toast from "react-hot-toast"
+import { motion } from "framer-motion"
 
 const signup = () => {
     const [showPassword, setShowPassword] = useState(false) 
@@ -41,12 +42,22 @@ const signup = () => {
                 {/* Logo */}
                 <div className="text-center mb-8">
                     <div className="flex flex-col items-center gap-2 group">
-                        <div
+                        <motion.div
                             className="size-12 rounded-xl bg-primary/10 flex items-center justify-center 
-                        group-hover:bg-primary/20 transition-colors"
+                            group-hover:bg-primary/20 transition-colors"
+                            initial={{
+                                y: 0
+                            }}
+                            animate={{
+                                y: 5
+                            }}
+                            transition={{
+                                repeat: Infinity,
+                                repeatType: "reverse"
+                            }}
                         >
                             <MessageSquare className="size-6 text-primary" />
-                        </div>
+                        </motion.div>
                         <h1 className="text-2xl font-bold mt-2">Create Account</h1>
                         <p className="text-base-content/60">Get started with your free account</p>
                     </div>
@@ -124,7 +135,7 @@ const signup = () => {
        <div className="mt-16">
          <AuthImagePattern
             title="Join our community" 
-            subtitle="Connect with friends, share moments, and stay in touch with your loved ones."
+            subtitle="Connect, share moments, and stay in touch—where friendships and memories are just a chat away."
          />
        </div>
     </div>

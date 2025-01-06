@@ -124,7 +124,7 @@ const login = () => {
        <div className="mt-16">
          <AuthImagePattern
             title="Join our community" 
-            subtitle="Connect with friends, share moments, and stay in touch with your loved ones."
+            subtitle="Connect, share moments, and stay in touch—where friendships and memories are just a chat away."
          />
        </div>
     </div>

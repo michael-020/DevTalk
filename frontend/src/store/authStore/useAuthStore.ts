@@ -49,7 +49,11 @@ export const useAuthStore = create<authState & authAction>((set, get) => ({ // t
 
             get().connectSocket()
         } catch (error) {
-             toast.error((error as AxiosError).message)
+            if (error instanceof AxiosError && error.response?.data?.msg) {
+                toast.error(error.response.data.msg as string);
+            } else {
+                toast.error("An unexpected error occurred.");
+            }
         } finally {
             set({isSigningUp: false})
         }
@@ -63,8 +67,12 @@ export const useAuthStore = create<authState & authAction>((set, get) => ({ // t
             toast.success("Logged in Successfully")
 
             get().connectSocket()
-        } catch (error: any) {
-             toast.error(error.response.data.message)
+        } catch (error) {
+            if (error instanceof AxiosError && error.response?.data?.msg) {
+                toast.error(error.response.data.msg as string);
+            } else {
+                toast.error("An unexpected error occurred.");
+            }
         } finally {
             set({isSigningUp: false})
         }
@@ -77,8 +85,11 @@ export const useAuthStore = create<authState & authAction>((set, get) => ({ // t
             toast.success("Logged out successfully")
             get().disconnectSocket()
         } catch (error:any) {
-            toast.error(error.response.data.messages)
-            console.error("error while loggin out")
+            if (error instanceof AxiosError && error.response?.data?.msg) {
+                toast.error(error.response.data.msg as string);
+            } else {
+                toast.error("An unexpected error occurred.");
+            }
         }
     },
 
@@ -90,9 +101,12 @@ export const useAuthStore = create<authState & authAction>((set, get) => ({ // t
             set({ authUser: res.data });
 
             toast.success("Profile updated successfully");
-        } catch (error: any) {
-            console.error("Error in update profile:", error);
-            toast.error(error.response?.data?.message || "Profile update failed");
+        } catch (error) {
+            if (error instanceof AxiosError && error.response?.data?.msg) {
+                toast.error(error.response.data.msg as string);
+            } else {
+                toast.error("An unexpected error occurred.");
+            }
         } finally {
             set({ isUpdatingProfile: false });
         }

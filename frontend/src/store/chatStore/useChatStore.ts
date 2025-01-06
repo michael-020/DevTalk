@@ -3,6 +3,7 @@ import { axiosInstance } from "../../lib/axios";
 import toast from "react-hot-toast";
 import { useAuthStore } from "../authStore/useAuthStore";
 import { chatAction, chatState } from "./types";
+import { AxiosError } from "axios";
 
 export interface IUser {
     _id: string;
@@ -39,8 +40,12 @@ export const useChatStore = create<chatState & chatAction>((set, get) => ({
         try {
             const res = await axiosInstance.get("/users/usernames");
             set({ users: res.data.users });
-        } catch (error: any) {
-            toast.error(error.response?.data?.message || "Error fetching users");
+        } catch (error) {
+            if (error instanceof AxiosError && error.response?.data?.msg) {
+                toast.error(error.response.data.msg as string);
+            } else {
+                toast.error("An unexpected error occurred.");
+            }
         } finally {
             set({ isUsersLoading: false });
         }
@@ -55,8 +60,12 @@ export const useChatStore = create<chatState & chatAction>((set, get) => ({
         try {
             const res = await axiosInstance.get(`/messages/${userId}`);
             set({ messages: res.data.messages });
-        } catch (error: any) {
-            // toast.error(error.response?.data?.message || "Error fetching messages");
+        } catch (error) {
+            if (error instanceof AxiosError && error.response?.data?.msg) {
+                toast.error(error.response.data.msg as string);
+            } else {
+                toast.error("An unexpected error occurred.");
+            }
         } finally {
             set({ isMessagesLoading: false });
         }
@@ -83,8 +92,12 @@ export const useChatStore = create<chatState & chatAction>((set, get) => ({
                 })
               );
             }
-        } catch (error: any) {
-            // toast.error(error.response?.data?.message || "Error sending message");
+        } catch (error) {
+            if (error instanceof AxiosError && error.response?.data?.msg) {
+                toast.error(error.response.data.msg as string);
+            } else {
+                toast.error("An unexpected error occurred.");
+            }
         }
     },
 

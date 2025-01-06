@@ -51,7 +51,7 @@ app.use("/api/v1/messages", messageRouter)
 
 async function main() {
   try {
-    await mongoose.connect("mongodb://localhost:27017/chat-app")
+    await mongoose.connect(process.env.MONGO_URL as string)
 
     console.log("Connected to db")
 
