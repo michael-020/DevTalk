@@ -16,7 +16,7 @@ const login = () => {
     const {login, isSigningUp} = useAuthStore()
 
     const validateForm = () => {
-        if (!formData.username) return toast.error("username is required");
+        if (!formData.username) return toast.error("Username is required");
        
         if (!formData.password) return toast.error("Password is required");
         if (formData.password.length < 6) return toast.error("Password must be at least 6 characters");
@@ -30,7 +30,7 @@ const login = () => {
         const success = validateForm() 
 
         if(success === true)
-                login(formData)
+            login(formData)
     }
 
   return (
@@ -101,7 +101,7 @@ const login = () => {
                     </div>
                     </div>
 
-                    <button type="submit" className="btn btn-primary w-full" disabled={isSigningUp}>
+                    <button type="submit" className="btn btn-primary w-full hover:scale-105" disabled={isSigningUp}>
                     {isSigningUp ? (
                         <>
                         <Loader2 className="size-5 animate-spin" />

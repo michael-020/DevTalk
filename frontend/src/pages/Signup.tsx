@@ -17,7 +17,7 @@ const signup = () => {
     const {signup, isSigningUp} = useAuthStore()
 
     const validateForm = () => {
-        if (!formData.username.trim()) return toast.error("Full name is required");
+        if (!formData.username.trim()) return toast.error("Username is required");
        
         if (!formData.password) return toast.error("Password is required");
         if (formData.password.length < 6) return toast.error("Password must be at least 6 characters");
@@ -31,7 +31,7 @@ const signup = () => {
         const success = validateForm() 
 
         if(success === true)
-                signup(formData)
+            signup(formData)
     }
 
   return (
@@ -53,7 +53,9 @@ const signup = () => {
                             }}
                             transition={{
                                 repeat: Infinity,
-                                repeatType: "reverse"
+                                repeatType: "reverse",
+                                duration: 0.5,
+                                ease: "linear"
                             }}
                         >
                             <MessageSquare className="size-6 text-primary" />
@@ -112,7 +114,7 @@ const signup = () => {
                         </div>
                     </div>
 
-                    <button type="submit" className="btn btn-primary w-full" disabled={isSigningUp}>
+                    <button type="submit" className="btn btn-primary w-full hover:scale-105" disabled={isSigningUp}>
                     {isSigningUp ? (
                         <>
                         <Loader2 className="size-5 animate-spin" />

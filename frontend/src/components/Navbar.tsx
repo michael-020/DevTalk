@@ -1,7 +1,19 @@
 import { Link } from "react-router-dom"
 import { useAuthStore } from "../store/authStore/useAuthStore"
 import { LogOut, MessageSquare, Settings, User } from "lucide-react"
+import { motion } from "framer-motion"
 
+const hoverAnimation = {
+  initial: {
+    scale: 1,
+  },
+  whileHover: {
+    scale: 1.05,    
+  },
+  whileTap: {
+    scale: 1
+  },
+}
 
 export const Navbar = () => {
 
@@ -24,28 +36,50 @@ export const Navbar = () => {
           </div>
 
           <div className="flex items-center gap-2">
-            <Link
-              to={"/settings"}
-              className={`
-              btn btn-sm btn-primary gap-2 transition-colors
-              
-              `}
-            >
-              <Settings className="w-4 h-4" />
-              <span className="hidden sm:inline">Settings</span>
-            </Link>
+            <motion.div
+              variants={hoverAnimation}
+              initial="initial"
+              whileHover={"whileHover"}
+              whileTap={"whileTap"}
+            > 
+              <Link
+                to={"/settings"}
+                className={`
+                btn btn-sm btn-primary gap-2 transition-colors
+                
+                `}
+                
+              >
+                <Settings className="w-4 h-4" />
+                <span className="hidden sm:inline">Settings</span>
+              </Link>
+            </motion.div>
+            
 
             {authUser && (
               <>
-                <Link to={"/profile"} className={`btn btn-sm gap-2`}>
-                  <User className="size-5" />
-                  <span className="hidden sm:inline">Profile</span>
-                </Link>
+                <motion.div
+                  variants={hoverAnimation}
+                  initial="initial"
+                  whileHover={"whileHover"}
+                  whileTap={"whileTap"}
+                >
+                  <Link to={"/profile"} className={`btn btn-sm  gap-2`}>
+                    <User className="size-5" />
+                    <span className="hidden sm:inline">Profile</span>
+                  </Link>
+                </motion.div>
+                
 
-                <button className="flex gap-2 items-center" onClick={logout}>
+                <motion.button className="flex gap-2 items-center" onClick={logout}
+                  variants={hoverAnimation}
+                  initial="initial"
+                  whileHover={"whileHover"}
+                  whileTap={"whileTap"}
+                >
                   <LogOut className="size-5" />
                   <span className="hidden sm:inline">Logout</span>
-                </button>
+                </motion.button>
               </>
             )}
           </div>
