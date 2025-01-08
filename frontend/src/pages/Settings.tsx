@@ -1,6 +1,27 @@
 import { Send } from "lucide-react";
 import { THEMES } from "../constants/themes";
 import { useThemeStore } from "../store/useThemeStore";
+import { motion } from "framer-motion";
+
+const routeVariants = {
+  initial: {
+      scale: 0.9,
+      opacity: 0,
+  },
+  final: {
+      scale: 1,
+      opacity: 1,
+      transition: {
+        duration: 0.8,
+        type: "spring",
+        ease: "easeInOut"
+      }
+  },
+  exit: {
+    scale:0.9,
+    opacity:0
+  }
+}
 
 const PREVIEW_MESSAGES = [
   { id: 1, content: "Hey! How's it going?", isSent: false },
@@ -12,7 +33,12 @@ export const Settings = () => {
 
 
   return (
-    <div className="h-full pb-20 container mx-auto px-4 pt-20 max-w-5xl">
+    <motion.div className="h-full pb-14 container mx-auto px-4 pt-20 max-w-5xl"
+      variants={routeVariants}
+      initial="initial"
+      animate="final"
+      exit="exit"
+    >
       <div className="space-y-6">
         <div className="flex flex-col gap-1">
           <h2 className="text-lg font-semibold">Theme</h2>
@@ -111,6 +137,6 @@ export const Settings = () => {
           </div>
         </div>
       </div>
-    </div>
+    </motion.div>
   )
 }

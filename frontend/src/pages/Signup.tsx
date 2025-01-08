@@ -6,6 +6,25 @@ import { AuthImagePattern } from "../components/AuthImagePattern"
 import toast from "react-hot-toast"
 import { motion } from "framer-motion"
 
+const routeVariants = {
+    initial: {
+        opacity: 0,
+    },
+    final: {
+        opacity: 1,
+        transition: {
+          duration: 0.2,
+          type: "spring",
+          stiffness: 20,
+          ease: "easeInOut"
+        }
+    },
+    exit: {
+      opacity:0,
+      
+    }
+  }
+
 const signup = () => {
     const [showPassword, setShowPassword] = useState(false) 
     const [formData, setFormData] = useState({
@@ -35,7 +54,12 @@ const signup = () => {
     }
 
   return (
-    <div className="min-h-screen grid lg:grid-cols-2 ">
+    <motion.div className="min-h-screen grid lg:grid-cols-2 "
+        variants={routeVariants}
+        initial="initial"
+        animate="final"
+        exit="exit"
+    >
        {/* left side */}
        <div className="flex flex-col p-6 sm:p-12 justify-center items-center">    
             <div className="w-full max-w-md space-y-8">
@@ -140,7 +164,7 @@ const signup = () => {
             subtitle="Connect, share moments, and stay in touch—where friendships and memories are just a chat away."
          />
        </div>
-    </div>
+    </motion.div>
   )
 }
 

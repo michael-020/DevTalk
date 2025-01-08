@@ -1,6 +1,28 @@
 import { ChangeEvent, useState } from "react";
 import { useAuthStore } from "../store/authStore/useAuthStore"
 import { Camera, User } from "lucide-react";
+import { motion } from "framer-motion";
+
+const routeVariants = {
+  initial: {
+      scale: 0.9,
+      opacity: 0,
+  },
+  final: {
+      scale: 1,
+      opacity: 1,
+      transition: {
+        duration: 0.8,
+        type: "spring",
+        ease: "easeInOut"
+      }
+  },
+  exit: {
+    scale:0.9,
+    opacity:0
+  }
+}
+
 
 export const Profile = () => {
   const { authUser, isUpdatingProfile, updateProfile } = useAuthStore();
@@ -24,8 +46,13 @@ export const Profile = () => {
   };
 
   return (
-    <div className="h-full pt-20">
-      <div className="max-w-2xl mx-auto p-4 py-8">
+    <motion.div className="h-full pt-20 mr-1 "
+      variants={routeVariants}
+      initial="initial"
+      animate="final"
+      exit="exit"
+    >
+      <div className="max-w-2xl mx-auto p-2 py-8">
         <div className="bg-base-300 rounded-xl p-6 space-y-8">
           <div className="text-center">
             <h1 className="text-2xl font-semibold ">Profile</h1>
@@ -100,6 +127,6 @@ export const Profile = () => {
           </div>
         </div>
       </div>
-    </div>
+    </motion.div>
   );
 }
