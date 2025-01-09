@@ -295,7 +295,7 @@ interface CustomWebSocket extends WebSocket {
 }
 
 socketServer.on("connection", function connection(socket: CustomWebSocket, req: http.IncomingMessage) {
-    console.log("A user connected");
+    // console.log("A user connected");
   
     // Extract userId from query params (e.g., ?userId=123)
     const url = new URL(req.url || "", `http://${req.headers.host}`);
@@ -318,7 +318,7 @@ socketServer.on("connection", function connection(socket: CustomWebSocket, req: 
                 // join room logic
                 socket.roomId = parsedMessage.payload.roomId
 
-                console.log(`User ${userId} joined room ${parsedMessage.payload.roomId}`);
+                // console.log(`User ${userId} joined room ${parsedMessage.payload.roomId}`);
             }
             else if(parsedMessage.type === "SEND_MESSAGE"){
                 const { roomId, content, image } = parsedMessage.payload;
@@ -347,7 +347,7 @@ socketServer.on("connection", function connection(socket: CustomWebSocket, req: 
 
     socket.on("close", () => {
         // logic to disconnect the user 
-        console.log("A client disconnected");
+        // console.log("A client disconnected");
 
         const userId = Object.keys(userSocketMap).find(
             (key) => userSocketMap[key] === socket
@@ -355,7 +355,7 @@ socketServer.on("connection", function connection(socket: CustomWebSocket, req: 
     
         if (userId) {
             delete userSocketMap[userId];
-            console.log(`User ${userId} removed from socket map`);
+            // console.log(`User ${userId} removed from socket map`);
 
             broadcastOnlineUsers();
         }

@@ -3,7 +3,6 @@ import { Response } from "express";
 import mongoose from "mongoose";
 
 export const generateToken = (userId: mongoose.Types.ObjectId, res: Response) => {
-  console.log("JWT_PASS:", process.env.JWT_SECRET as string); 
   const token = jwt.sign({ userId }, process.env.JWT_SECRET as string, {
     expiresIn: "7d",
   });

@@ -13,7 +13,6 @@ import path from "path"
 
 const __dirname = path.resolve()
 
-// export const app: Express = express();
 app.use(express.json({ 
     limit: '100mb'  // Increased limit
   }));
@@ -56,7 +55,7 @@ async function main() {
 
     // setUpWebSocketServer(wss, JWT_PASS);
 
-    server.listen(3000, () => {
+    server.listen(process.env.PORT, () => {
       console.log('Server running on port 3000');
     });
   } catch (error) {
