@@ -10,7 +10,7 @@ type Action = {
 
 
 export const useThemeStore = create<State & Action>((set) => ({
-    theme: localStorage.getItem("chat-theme") || "coffee",
+    theme: localStorage.getItem("chat-theme") || "dark",
 
     setTheme: (theme: string) => {
         localStorage.setItem("chat-theme", theme);
