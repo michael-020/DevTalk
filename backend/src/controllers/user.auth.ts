@@ -1,6 +1,6 @@
 import { Request, Response } from "express";
-import { userModel } from "../model/db";
-import { generateToken } from "../lib/utils";
+import { userModel } from "../model/db.js";
+import { generateToken } from "../lib/utils.js";
 import bcrypt from "bcrypt"
 
 

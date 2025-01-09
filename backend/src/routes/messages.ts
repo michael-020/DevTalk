@@ -1,8 +1,8 @@
 import  { Request, Response, Router } from "express";
-import { chatModel, chatRoomModel, userModel } from "../model/db";
-import { userMiddleware } from "../middleware/auth";
-import cloudinary from "../lib/cloudinary";
-import { userSocketMap } from "../wss/wss";
+import { chatModel, chatRoomModel, userModel } from "../model/db.js";
+import { userMiddleware } from "../middleware/auth.js";
+import cloudinary from "../lib/cloudinary.js";
+import { userSocketMap } from "../wss/wss.js";
 
 
 const messageRouter = Router()

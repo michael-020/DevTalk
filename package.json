@@ -1,23 +1,10 @@
 {
   "name": "devtalk",
   "version": "1.0.0",
-  "main": "index.js",
   "scripts": {
-   "build": "npm install --prefix backend && npm install --prefix frontend && npm run build:frontend",
+    "build": "npm install --prefix backend && npm install --prefix frontend && npm run build:frontend && npm run build:backend",
     "build:frontend": "npm run build --prefix frontend",
-    "start": "node backend/index.js"
-  },
-  "repository": {
-    "type": "git",
-    "url": "git+https://github.com/Michael-2702/Full-Stack-Chat-App.git"
-  },
-  "keywords": [],
-  "author": "",
-  "license": "ISC",
-  "type": "commonjs",
-  "bugs": {
-    "url": "https://github.com/Michael-2702/Full-Stack-Chat-App/issues"
-  },
-  "homepage": "https://github.com/Michael-2702/Full-Stack-Chat-App#readme",
-  "description": ""
+    "build:backend": "npm run build --prefix backend",
+    "start": "node backend/dist/index.js"  
+  }
 }

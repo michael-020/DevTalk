@@ -1,7 +1,6 @@
 import { NextFunction, Request, Response } from "express";
 import jwt, { JwtPayload } from "jsonwebtoken"
-import { JWT_PASS } from "./../config"
-import { IUser, userModel } from "../model/db";
+import { IUser, userModel } from "../model/db.js";
 
 interface customDecodedInterface {
     userId?: string;
@@ -18,7 +17,7 @@ export const userMiddleware = async (req: Request, res: Response, next: NextFunc
         return
     }
 
-    const decoded = jwt.verify(token, JWT_PASS) as JwtPayload
+    const decoded = jwt.verify(token, process.env.JWT_SECRET as string) as JwtPayload
     
     if(decoded){
         const user = await userModel.findById((decoded as customDecodedInterface).userId).select("-password")

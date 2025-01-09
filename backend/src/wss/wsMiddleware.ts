@@ -1,8 +1,8 @@
 import { WebSocketServer } from "ws";
 import http from "http"
 import jwt from "jsonwebtoken"
-import { userModel } from "../model/db";
-import { ExtendedWebSocket } from "./customInterfaces";
+import { userModel } from "../model/db.js";
+import { ExtendedWebSocket } from "./customInterfaces.js";
 
 
 

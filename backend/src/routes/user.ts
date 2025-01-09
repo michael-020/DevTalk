@@ -1,12 +1,8 @@
 import express, { Request, Response, Router } from "express";
-import { userModel } from "../model/db";
-import { userMiddleware } from "../middleware/auth";
-import cloudinary from "../lib/cloudinary";
-import { logoutHandler, signinHandler, signupHandler } from "../controllers/user.auth";
-
-
-// const storage = multer.memoryStorage(); // Store file in memory for processing
-// const upload = multer({ storage });
+import { userModel } from "../model/db.js";
+import { userMiddleware } from "../middleware/auth.js";
+import cloudinary from "../lib/cloudinary.js";
+import { logoutHandler, signinHandler, signupHandler } from "../controllers/user.auth.js";
 
 const userRouter = Router();
 userRouter.use(express.json())

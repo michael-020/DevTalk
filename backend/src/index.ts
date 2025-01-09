@@ -2,14 +2,13 @@ import dotenv from "dotenv"
 dotenv.config()
 import express from "express"
 import cors from "cors"
-import userRouter from "./routes/user";
+import userRouter from "./routes/user.js";
 import mongoose from "mongoose";
-import './override';
-import app, { server } from "./wss/wss";
-import { JWT_PASS } from "./config";
+import './override.js';
+import app, { server } from "./wss/wss.js";
 import bodyParser from "body-parser";
 import cookieParser from "cookie-parser";
-import messageRouter from "./routes/messages";
+import messageRouter from "./routes/messages.js";
 import path from "path"
 
 const __dirname = path.resolve()

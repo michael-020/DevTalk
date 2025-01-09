@@ -1,5 +1,5 @@
 import { JwtPayload } from "jsonwebtoken";
-import { IUser } from "./model/db";
+import { IUser } from "./model/db.js";
 
 declare global{
     export namespace Express {
