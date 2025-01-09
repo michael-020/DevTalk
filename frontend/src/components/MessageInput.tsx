@@ -1,5 +1,4 @@
 import { ChangeEvent, FormEvent, useRef, useState } from "react";
-
 import { Image, Send, X } from "lucide-react";
 import { useChatStore } from "../store/chatStore/useChatStore";
 import toast from "react-hot-toast";
@@ -99,10 +98,11 @@ const MessageInput = () => {
         </div>
         <button
           type="submit"
-          className="btn btn-sm btn-circle"
+          className="btn btn-primary h-10 min-h-0"
           disabled={!text.trim() && !imagePreview}
         >
           <Send size={22} />
+          
         </button>
       </form>
     </div>

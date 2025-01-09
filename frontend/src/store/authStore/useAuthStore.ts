@@ -27,6 +27,7 @@ export const useAuthStore = create<authState & authAction>((set, get) => ({ // t
 
     checkAuth: async () => {
         try {
+            // await new Promise(r => setTimeout(r, 2000))
             const res = await axiosInstance.get("/users/check")
             set({authUser: res.data})
 

@@ -15,5 +15,4 @@ export const THEMES = [
     "aqua",
     "lofi",
     "pastel",
-
 ];

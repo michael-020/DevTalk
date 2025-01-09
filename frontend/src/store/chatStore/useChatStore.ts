@@ -38,6 +38,7 @@ export const useChatStore = create<chatState & chatAction>((set, get) => ({
     getUsers: async () => {
         set({ isUsersLoading: true });
         try {
+            // await new Promise(e => setTimeout(e, 1000))
             const res = await axiosInstance.get("/users/usernames");
             set({ users: res.data.users });
         } catch (error) {

@@ -4,8 +4,8 @@ import MessageInput from "./MessageInput"
 import { useAuthStore } from "../store/authStore/useAuthStore"
 import ChatHeader from "./ChatHeader"
 import { formatMessageTime } from "../lib/utils"
-import { Loader } from "lucide-react"
-
+import MessageSkeleton from "./skeletons/MessageSkeleton"
+import { motion } from "framer-motion"
 
 const ChatContainer = () => {
   const {messages, getMessages, isMessagesLoading, selectedUser, subscribeToMessages, unSubscribeFromMessages} = useChatStore()
@@ -29,12 +29,38 @@ const ChatContainer = () => {
     }, [messages])
 
   if(isMessagesLoading){
-    return <div className="animate-spin h-full w-full flex items-center justify-center">
-     <Loader />
+    return <div className="h-full w-full ">
+      <ChatHeader />
+
+      <motion.div className="flex-1 overflow-y-auto p-4 space-y-4 -mt-3 "
+      initial={{
+        opacity: 0,
+      }}
+      animate={{
+        opacity: 1,
+        
+      }}
+      transition={{
+        duration: 0,
+        type: "spring",
+        ease: "linear"
+      }}
+        exit={{
+          opacity: 0,
+          transition: {
+            duration: 2,
+          }
+        }}
+      >
+       {  <MessageSkeleton /> }
+      </motion.div>
+
+
+         <MessageInput />
+
+      
     </div>
   }
-
-  
 
   return (
     <div className="flex-1 flex flex-col overflow-auto">
@@ -44,7 +70,7 @@ const ChatContainer = () => {
         {messages && messages.map((message) => (
           <div
             key={message._id}
-            className={`chat ${message.sender === authUser?._id ? "chat-end" : "chat-start"}`}
+            className={`chat ${message.sender === authUser?._id ? "chat-end " : "chat-start"}`}
             ref={messageEndRef}
           >
             <div className=" chat-image avatar">
@@ -66,12 +92,12 @@ const ChatContainer = () => {
                 {formatMessageTime(message.createdAt)}
               </time>
             </div>
-            <div className="chat-bubble flex flex-col">
+            <div className={`chat-bubble flex flex-col ${message.sender === authUser?._id ? "bg-primary/25  text-base-content " : "bg-base-200 text-base-content "}  `}>
               {message.image && (
                 <img
                   src={message.image}
                   alt="Attachment"
-                  className="sm:max-w-[200px] rounded-md mb-2"
+                  className="sm:max-w-[200px] rounded-md mb-2 mt-2"
                 />
               )}
               {message.content && <p>{message.content}</p>}

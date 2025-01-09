@@ -100,14 +100,14 @@ export const Settings = () => {
                       <div
                         className={`
                           max-w-[80%] rounded-xl p-3 shadow-sm
-                          ${message.isSent ? "bg-primary text-primary-content" : "bg-base-200"}
+                          ${message.isSent ? "bg-primary/25  " : "bg-base-200"}
                         `}
                       >
                         <p className="text-sm">{message.content}</p>
                         <p
                           className={`
                             text-[10px] mt-1.5
-                            ${message.isSent ? "text-primary-content/70" : "text-base-content/70"}
+                            ${message.isSent ? "" : "text-base-content/70"}
                           `}
                         >
                           12:00 PM
@@ -127,7 +127,7 @@ export const Settings = () => {
                       value="This is a preview"
                       readOnly
                     />
-                    <button className="btn btn-primary h-10 min-h-0">
+                    <button className="btn btn-primary bg-primary/25 border-0 h-10 min-h-0">
                       <Send size={18} />
                     </button>
                   </div>
