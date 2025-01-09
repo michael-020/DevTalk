@@ -11,9 +11,12 @@ export enum MessageTypes {
     LEAVE = 'LEAVE'
 }
 
-const BASE_URL = import.meta.env.MODE === "development" ? "ws://localhost:3000" : "/";
+const BASE_URL = import.meta.env.MODE === "development" 
+  ? "ws://localhost:3000" 
+  : `wss://${window.location.host}`;
 
-export const useAuthStore = create<authState & authAction>((set, get) => ({ // this is set function to change state of the function
+
+export const useAuthStore = create<authState & authAction>((set, get) => ({
     // these are state variables
     authUser: null,
     isSigningUp: false,
@@ -22,9 +25,7 @@ export const useAuthStore = create<authState & authAction>((set, get) => ({ // t
     isCheckingAuth: true,
     onlineUsers: [],
     socket: null,
-
-   
-
+ 
     checkAuth: async () => {
         try {
             // await new Promise(r => setTimeout(r, 2000))
