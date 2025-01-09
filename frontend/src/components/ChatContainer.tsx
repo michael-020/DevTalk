@@ -29,7 +29,7 @@ const ChatContainer = () => {
     }, [messages])
 
   if(isMessagesLoading){
-    return <div className="h-full w-full ">
+    return <div className="h-full w-full relative">
       <ChatHeader />
 
       <motion.div className="flex-1 overflow-y-auto p-4 space-y-4 -mt-3 "
@@ -55,10 +55,9 @@ const ChatContainer = () => {
        {  <MessageSkeleton /> }
       </motion.div>
 
-
+      <div className="absolute bottom-0 w-full">
          <MessageInput />
-
-      
+      </div>
     </div>
   }
 
