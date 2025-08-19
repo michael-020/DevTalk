@@ -41,6 +41,28 @@ app.use(cors({
 app.use("/api/v1/users", userRouter)
 app.use("/api/v1/messages", messageRouter)
 
+app.use("/health", (req, res) => {
+  try {
+    res.status(200).json({
+      success: true,
+      message: 'Server is healthy',
+      timestamp: new Date().toISOString(),
+      uptime: process.uptime()
+    });
+  } catch (error: unknown) {
+    let errorMessage = 'Unknown error';
+    if (error instanceof Error) {
+      errorMessage = error.message;
+    }
+
+    res.status(500).json({
+      success: false,
+      message: 'Server health check failed',
+      error: errorMessage
+    });
+  }
+})
+
 if(process.env.NODE_ENV === "production"){
   const rootDir = path.resolve(__dirname, '..');
   app.use(express.static(path.join(rootDir, '../frontend/dist')))
