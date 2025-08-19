@@ -61,7 +61,7 @@ const signup = () => {
         exit="exit"
     >
        {/* left side */}
-       <div className="flex flex-col p-6 sm:p-12 justify-center items-center">    
+       <div className="flex flex-col p-6 pt-20 sm:pt-0 sm:p-12 justify-center items-center">    
             <div className="w-full max-w-md space-y-8">
                 {/* Logo */}
                 <div className="text-center mb-8">
