@@ -41,7 +41,7 @@ app.use(cors({
 app.use("/api/v1/users", userRouter)
 app.use("/api/v1/messages", messageRouter)
 
-app.use("/health", (req, res) => {
+app.get("/health", (req, res) => {
   try {
     res.status(200).json({
       success: true,
